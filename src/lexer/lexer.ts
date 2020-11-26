@@ -1,4 +1,3 @@
-import { throws } from 'assert';
 import { Diagnostic } from '../Diagnostic';
 import { Token, TokenType } from './token';
 

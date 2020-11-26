@@ -1,9 +1,9 @@
 import chalk = require('chalk');
-import SyntaxTree from './src/parser/SyntaxTree';
+import SyntaxTree from '../src/parser/SyntaxTree';
 import * as util from 'util';
 import { CLI } from './pkg/CLI';
-import { Compilation } from './src/Compilation';
-import { VariableSymbol } from './src/Variable';
+import { Compilation } from '../src/Compilation';
+import { VariableSymbol } from '../src/Variable';
 
 function print(msg: string) {
   process.stdout.write(msg);

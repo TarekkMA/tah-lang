@@ -2,11 +2,12 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "outDir": "out",
+    "outDir": "ts_out",
     "sourceMap": true,
     "strictNullChecks": true,
     "strict": true,
     "alwaysStrict": true,
     "noImplicitAny": true
-  }
+  },
+  "exclude": ["node_modules", "**/*.spec.ts", "build/**/*"]
 }

@@ -1,5 +1,3 @@
-import { throws } from 'assert';
-import { stat } from 'fs';
 import { Diagnostic } from '../Diagnostic';
 import { VariableSymbol } from '../Variable';
 import { BoundStatement } from './BoundNodes';

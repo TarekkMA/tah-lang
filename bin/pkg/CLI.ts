@@ -1,4 +1,3 @@
-import { R_OK } from 'constants';
 import * as readline from 'readline';
 
 const rl = readline.createInterface({

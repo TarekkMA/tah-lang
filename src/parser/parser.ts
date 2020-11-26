@@ -1,6 +1,3 @@
-import { throws } from 'assert';
-import { stat } from 'fs';
-import { off } from 'process';
 import { Diagnostic } from '../Diagnostic';
 import Lexer from '../lexer/lexer';
 import { Token, TokenType } from '../lexer/token';

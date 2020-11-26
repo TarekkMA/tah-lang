@@ -5,13 +5,12 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch REPL",
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/main.ts",
-      "console": "integratedTerminal",
-      "preLaunchTask": "tsc: build - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/out/**/*.js"]
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${workspaceFolder}/bin/main.ts"],
+      "console": "integratedTerminal"
     }
   ]
 }

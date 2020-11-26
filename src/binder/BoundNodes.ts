@@ -1,4 +1,3 @@
-import { throws } from 'assert';
 import { VariableSymbol, VariableType } from '../Variable';
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
 
