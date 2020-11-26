@@ -27,7 +27,6 @@ import {
   VariableDeclarationStatement,
   WhileStatement,
 } from './Nodes';
-import SyntaxTree from './SyntaxTree';
 
 export default class Parser {
   private tokens: Token[];
@@ -35,8 +34,8 @@ export default class Parser {
   public diagnostics: Diagnostic[] = [];
 
   constructor(codeString: string) {
-    let tokens: Token[] = [];
-    let lexer = new Lexer(codeString);
+    const tokens: Token[] = [];
+    const lexer = new Lexer(codeString);
 
     let token: Token;
     do {
@@ -64,7 +63,7 @@ export default class Parser {
   }
 
   private nextToken(): Token {
-    let token = this.current;
+    const token = this.current;
     this.position++;
     return token;
   }
@@ -206,14 +205,14 @@ export default class Parser {
       const idToken = this.matchToken(TokenType.Identifier);
       const equalsToken = this.matchToken(TokenType.Equal);
       const right = this.parseAssignmentExpression();
-      return new AssignmentExpression(idToken,equalsToken, right);
+      return new AssignmentExpression(idToken, equalsToken, right);
     }
     return this.parseBinaryExpression();
   }
 
-  private parseBinaryExpression(parentrPrecedence: number = 0): Expression {
+  private parseBinaryExpression(parentrPrecedence = 0): Expression {
     let left: Expression;
-    let unaryPrecedence = TokenFacts.getUnaryOperatorPrecedence(
+    const unaryPrecedence = TokenFacts.getUnaryOperatorPrecedence(
       this.current.type,
     );
     if (unaryPrecedence != null && unaryPrecedence >= parentrPrecedence) {
@@ -243,13 +242,16 @@ export default class Parser {
       case TokenType.OpenParenthesis: {
         const openPren = this.matchToken(TokenType.OpenParenthesis);
         const expression = this.parseExpression();
-        const closePren =this.matchToken(TokenType.CloseParenthesis);
-        return new ParenthesizedExpression(openPren,expression,closePren);
+        const closePren = this.matchToken(TokenType.CloseParenthesis);
+        return new ParenthesizedExpression(openPren, expression, closePren);
       }
       case TokenType.True:
       case TokenType.False: {
         const token = this.matchToken(TokenType.True, TokenType.False);
-        return new BooleanLiteralExpression(token.type == TokenType.True,token);
+        return new BooleanLiteralExpression(
+          token.type == TokenType.True,
+          token,
+        );
       }
       case TokenType.Identifier: {
         const token = this.matchToken(TokenType.Identifier);
@@ -258,7 +260,7 @@ export default class Parser {
       case TokenType.Number: {
         const numberToken = this.matchToken(TokenType.Number);
         const numberValue = Number(numberToken.text);
-        return new NumberLiteralExpression(numberValue,numberToken);
+        return new NumberLiteralExpression(numberValue, numberToken);
       }
       case TokenType.String: {
         const stringToken = this.matchToken(TokenType.String);
@@ -266,7 +268,7 @@ export default class Parser {
           1,
           stringToken.text!.length - 1,
         );
-        return new StringLiteralExpression(stringValue,stringToken);
+        return new StringLiteralExpression(stringValue, stringToken);
       }
       default: {
         this.diagnostics.push(

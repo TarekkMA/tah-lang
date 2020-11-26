@@ -33,7 +33,7 @@ const lexerPatterns: LexerPattern[] = [
   new LexerPattern(/^\>\=/, TokenType.GreaterEqal),
   new LexerPattern(/^\</, TokenType.Less),
   new LexerPattern(/^\>/, TokenType.Greater),
-  
+
   new LexerPattern(/^\!\=/, TokenType.BangEqal),
   new LexerPattern(/^\!/, TokenType.Bang),
   new LexerPattern(/^\=\=/, TokenType.EqualEqual),
@@ -55,7 +55,7 @@ const lexerPatterns: LexerPattern[] = [
 
 export default class Lexer {
   private readonly codeString: string;
-  private position: number = 0;
+  private position = 0;
   public diagnostics: Diagnostic[] = [];
 
   constructor(codeString: string) {
@@ -75,7 +75,7 @@ export default class Lexer {
     const codeStr = this.codeString.substring(this.position);
     for (let i = 0; i < lexerPatterns.length; i++) {
       const pattern = lexerPatterns[i];
-      let matches = pattern.pattern.exec(codeStr);
+      const matches = pattern.pattern.exec(codeStr);
       if (matches != null) {
         const matchedText = matches[0];
         const matchPos = this.position;
@@ -84,9 +84,9 @@ export default class Lexer {
       }
     }
 
-    let badChar = this.current();
-    let badPosition = this.position;
-    let badToken = new Token(badPosition, TokenType.BadChar, badChar);
+    const badChar = this.current();
+    const badPosition = this.position;
+    const badToken = new Token(badPosition, TokenType.BadChar, badChar);
     this.diagnostics.push(
       new Diagnostic(badToken.getTextSpan(), `Bad character input: ${badChar}`),
     );

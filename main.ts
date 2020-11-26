@@ -18,14 +18,14 @@ function println(msg: string) {
     let codeString = '';
     let showAst = false;
     let previous: Compilation | undefined;
-    let variables = new Map<VariableSymbol, any>();
+    const variables = new Map<VariableSymbol, any>();
 
     while (true) {
       if (codeString.length == 0) print(chalk.green('» '));
       else print(chalk.green('. '));
 
-      let input = await CLI.readline();
-      let isBlank = input == null || input.trim().length == 0;
+      const input = await CLI.readline();
+      const isBlank = input == null || input.trim().length == 0;
 
       if (codeString.length == 0) {
         if (isBlank) {
@@ -52,7 +52,7 @@ function println(msg: string) {
 
       if (!isBlank && syntaxTree.diagnostics.length > 0) continue;
 
-      let compilation = previous
+      const compilation = previous
         ? previous.continueWith(syntaxTree)
         : new Compilation(syntaxTree);
 

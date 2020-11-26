@@ -1,4 +1,3 @@
-import { stat } from 'fs';
 import { Diagnostic } from '../Diagnostic';
 import { TokenType } from '../lexer/token';
 import { CompilationUnit } from '../parser/CompilationUnit';
@@ -20,7 +19,6 @@ import {
   VariableDeclarationStatement,
   WhileStatement,
 } from '../parser/Nodes';
-import { TextSpan } from '../TextSpan';
 import {
   VariableSymbol,
   VariableType,
@@ -82,8 +80,8 @@ export class Binder {
 
     while (stack.length > 0) {
       previous = stack.pop();
-      let scope = new BoundScope(parent);
-      for (let v of previous?.variables || []) {
+      const scope: BoundScope = new BoundScope(parent);
+      for (const v of previous?.variables || []) {
         scope.tryDeclare(v);
       }
       parent = scope;
@@ -134,7 +132,9 @@ export class Binder {
     let type: VariableType;
 
     if (statement.asTypePart != undefined) {
-      const typeFromToken = variableTypeFromTokenType(statement.asTypePart.typeToken.type);
+      const typeFromToken = variableTypeFromTokenType(
+        statement.asTypePart.typeToken.type,
+      );
 
       if (initializer != undefined && initializer.type != typeFromToken) {
         this.diagnostics.push(
