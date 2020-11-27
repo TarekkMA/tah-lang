@@ -1,47 +1,67 @@
 import { Token } from '../lexer/token';
 import { TextSpan } from '../TextSpan';
+import { AstNode } from '../visualization/ast';
 
-export abstract class SyntaxNode {
+export abstract class SyntaxNode implements AstNode {
   public abstract readonly textSpan: TextSpan;
+  public abstract readonly name: string;
+  public abstract readonly children?: AstNode[];
 }
 
 export abstract class Expression extends SyntaxNode {}
 export class ExpressionStub extends Expression {
   readonly textSpan = new TextSpan(0, 0);
+  readonly name = 'ExpressionStub';
+
+  public get children(): AstNode[] | undefined {
+    return undefined;
+  }
 }
 
 export abstract class Statement extends SyntaxNode {}
 
 export abstract class LiteralExpression<T> extends Expression {
-  public get textSpan() {
-    return this.literalToken.getTextSpan();
+  public get textSpan(): TextSpan {
+    return this.literalToken.textSpan;
   }
 
   constructor(readonly value: T, readonly literalToken: Token) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.literalToken];
+  }
 }
 
 export class StringLiteralExpression extends LiteralExpression<string> {
+  readonly name = 'StringLiteralExpression';
+
   constructor(value: string, literalToken: Token) {
     super(value, literalToken);
   }
 }
 
 export class NumberLiteralExpression extends LiteralExpression<number> {
+  readonly name = 'NumberLiteralExpression';
+
   constructor(value: number, literalToken: Token) {
     super(value, literalToken);
   }
 }
 
 export class BooleanLiteralExpression extends LiteralExpression<boolean> {
+  readonly name = 'BooleanLiteralExpression';
+
   constructor(value: boolean, literalToken: Token) {
     super(value, literalToken);
   }
 }
 
 export class BinaryExpression extends Expression {
-  public get textSpan() {
+  readonly name = 'BinaryExpression';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(this.left.textSpan.start, this.right.textSpan.end);
   }
   constructor(
@@ -51,12 +71,18 @@ export class BinaryExpression extends Expression {
   ) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.left, this.oprator, this.right];
+  }
 }
 
 export class UnaryExpression extends Expression {
-  public get textSpan() {
+  readonly name = 'UnaryExpression';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.operator.getTextSpan().start,
+      this.operator.textSpan.start,
       this.operand.textSpan.end,
     );
   }
@@ -64,13 +90,18 @@ export class UnaryExpression extends Expression {
   constructor(readonly operator: Token, readonly operand: Expression) {
     super();
   }
+  public get children(): AstNode[] | undefined {
+    return [this.operator, this.operand];
+  }
 }
 
 export class ParenthesizedExpression extends Expression {
-  public get textSpan() {
+  readonly name = 'ParenthesizedExpression';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.openParenthesisToken.getTextSpan().start,
-      this.openParenthesisToken.getTextSpan().end,
+      this.openParenthesisToken.textSpan.start,
+      this.openParenthesisToken.textSpan.end,
     );
   }
   constructor(
@@ -80,12 +111,22 @@ export class ParenthesizedExpression extends Expression {
   ) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [
+      this.openParenthesisToken,
+      this.expression,
+      this.closeParenthesisToken,
+    ];
+  }
 }
 
 export class AssignmentExpression extends Expression {
-  public get textSpan() {
+  readonly name = 'AssignmentExpression';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.identifier.getTextSpan().start,
+      this.identifier.textSpan.start,
       this.expression.textSpan.end,
     );
   }
@@ -96,22 +137,34 @@ export class AssignmentExpression extends Expression {
   ) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.identifier, this.equalsToken, this.expression];
+  }
 }
 
 export class NameExpression extends Expression {
-  public get textSpan() {
-    return this.identifier.getTextSpan();
+  readonly name = 'NameExpression';
+
+  public get textSpan(): TextSpan {
+    return this.identifier.textSpan;
   }
   constructor(readonly identifier: Token) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.identifier];
+  }
 }
 
 export class BlockStatement extends Statement {
-  public get textSpan() {
+  readonly name = 'BlockStatement';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.openBraceToken.getTextSpan().start,
-      this.closeBraceToken.getTextSpan().end,
+      this.openBraceToken.textSpan.start,
+      this.closeBraceToken.textSpan.end,
     );
   }
   constructor(
@@ -121,24 +174,36 @@ export class BlockStatement extends Statement {
   ) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.openBraceToken, ...this.statements, this.closeBraceToken];
+  }
 }
 
 export class ExpressionStatement extends Statement {
-  public get textSpan() {
+  readonly name = 'ExpressionStatement';
+
+  public get textSpan(): TextSpan {
     return this.expression.textSpan;
   }
   constructor(readonly expression: Expression) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.expression];
+  }
 }
 
 export class VariableDeclarationStatement extends Statement {
-  public get textSpan() {
-    const start = this.keywordToken.getTextSpan().start;
+  readonly name = 'VariableDeclarationStatement';
+
+  public get textSpan(): TextSpan {
+    const start = this.keywordToken.textSpan.start;
     const end =
       this.initializerPart?.textSpan.end ||
       this.asTypePart?.textSpan.end ||
-      this.identifier.getTextSpan().end;
+      this.identifier.textSpan.end;
     return new TextSpan(start, end);
   }
   constructor(
@@ -149,36 +214,56 @@ export class VariableDeclarationStatement extends Statement {
   ) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return (<AstNode[]>[this.keywordToken, this.identifier]).concat(
+      this.asTypePart?.children || [],
+      this.initializerPart?.initializer || [],
+    );
+  }
 }
 
 export class VariableDeclarationInitalizerPart extends SyntaxNode {
-  public get textSpan() {
+  readonly name = 'VariableDeclarationInitalizerPart';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.equalsToken.getTextSpan().start,
+      this.equalsToken.textSpan.start,
       this.initializer.textSpan.end,
     );
   }
   constructor(readonly equalsToken: Token, readonly initializer: Expression) {
     super();
   }
+  public get children(): AstNode[] | undefined {
+    return [this.equalsToken, this.initializer];
+  }
 }
 
 export class VariableDeclarationAsTypePart extends SyntaxNode {
-  public get textSpan() {
+  readonly name = 'VariableDeclarationAsTypePart';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.asKeywordToken.getTextSpan().start,
-      this.typeToken.getTextSpan().end,
+      this.asKeywordToken.textSpan.start,
+      this.typeToken.textSpan.end,
     );
   }
   constructor(readonly asKeywordToken: Token, readonly typeToken: Token) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.asKeywordToken, this.typeToken];
+  }
 }
 
 export class IfStatement extends Statement {
-  public get textSpan() {
+  readonly name = 'IfStatement';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.ifKeyword.getTextSpan().start,
+      this.ifKeyword.textSpan.start,
       this.elseClause?.textSpan.end || this.thenStatement.textSpan.end,
     );
   }
@@ -190,24 +275,38 @@ export class IfStatement extends Statement {
   ) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.ifKeyword, this.condition, this.thenStatement].concat(
+      this.elseClause ? this.elseClause : [],
+    );
+  }
 }
 
 export class ElseClause extends SyntaxNode {
-  public get textSpan() {
+  readonly name = 'ElseClause';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.elseKeyword.getTextSpan().start,
+      this.elseKeyword.textSpan.start,
       this.elseStatement.textSpan.end,
     );
   }
   constructor(readonly elseKeyword: Token, readonly elseStatement: Statement) {
     super();
   }
+
+  public get children(): AstNode[] | undefined {
+    return [this.elseKeyword, this.elseStatement];
+  }
 }
 
 export class WhileStatement extends Statement {
-  public get textSpan() {
+  readonly name = 'WhileStatement';
+
+  public get textSpan(): TextSpan {
     return new TextSpan(
-      this.whileKeyword.getTextSpan().start,
+      this.whileKeyword.textSpan.start,
       this.body.textSpan.end,
     );
   }
@@ -217,5 +316,9 @@ export class WhileStatement extends Statement {
     readonly body: Statement,
   ) {
     super();
+  }
+
+  public get children(): AstNode[] | undefined {
+    return [this.whileKeyword, this.condition, this.body];
   }
 }

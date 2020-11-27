@@ -1,10 +1,12 @@
 import { Diagnostic } from '../Diagnostic';
 import { TextSpan } from '../TextSpan';
+import { AstNode } from '../visualization/ast';
 import { CompilationUnit } from './CompilationUnit';
 import { SyntaxNode } from './Nodes';
 import Parser from './parser';
 
 export default class SyntaxTree implements SyntaxNode {
+  readonly name = 'SyntaxTree';
   readonly diagnostics: Diagnostic[];
   readonly root: CompilationUnit;
 
@@ -13,8 +15,12 @@ export default class SyntaxTree implements SyntaxNode {
     this.diagnostics = diagnostics;
   }
 
-  public get textSpan() {
+  public get textSpan(): TextSpan {
     return this.root.statement.textSpan;
+  }
+
+  public get children(): AstNode[] {
+    return [this.root.statement];
   }
 
   static parse(text: string): SyntaxTree {

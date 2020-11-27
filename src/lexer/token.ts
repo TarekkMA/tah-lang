@@ -1,4 +1,5 @@
 import { TextSpan } from '../TextSpan';
+import { AstNode } from '../visualization/ast';
 
 export enum TokenType {
   WhiteSpace,
@@ -50,18 +51,27 @@ export enum TokenType {
   ElseKeyword,
 }
 
-export class Token {
+export class Token implements AstNode {
   public readonly position: number;
-  public readonly type: TokenType;
   public readonly text?: string;
 
-  constructor(position: number, type: TokenType, text?: string) {
+  constructor(position: number, readonly type: TokenType, text?: string) {
     this.position = position;
-    this.type = type;
     this.text = text;
   }
 
-  getTextSpan(): TextSpan {
+  readonly name: string = TokenType[this.type];
+  get children(): AstNode[] | undefined {
+    if (this.text) {
+      return [
+        {
+          name: this.text,
+        },
+      ];
+    }
+    return undefined;
+  }
+  get textSpan(): TextSpan {
     return new TextSpan(this.position, this.text?.length || 0);
   }
 

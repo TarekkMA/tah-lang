@@ -2,9 +2,10 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 /**
- * @returns {import("webpack").Configuration}
+ * @returns {webpack.Configuration}
  */
 const config = (env) => {
   const isProd = env.PROD != undefined;
@@ -22,6 +23,11 @@ const config = (env) => {
       }),
       new MonacoWebpackPlugin({
         languages: [],
+        customLanguages: ['tah'],
+      }),
+      new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
       }),
       new CleanWebpackPlugin(),
     ],
@@ -39,6 +45,14 @@ const config = (env) => {
         {
           test: /\.ttf$/,
           use: ['file-loader'],
+        },
+        {
+          test: /\.(png|jpe?g|gif)$/i,
+          use: [
+            {
+              loader: 'file-loader',
+            },
+          ],
         },
       ],
     },

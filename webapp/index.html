@@ -6,23 +6,30 @@
     <title>Tah Lang</title>
   </head>
   <body>
-    <div id="vseditor" style="width: 50%; height: 50vh"></div>
-    <br />
+    <div style="display: flex">
+      <div id="vseditor" style="width: 50%; min-height: 50vh"></div>
 
-    <button id="run-btn">Run</button>
+      <div>
+        AST:
+        <div id="ast"></div>
+      </div>
+    </div>
+    <div style="clear: both">
+      <button id="run-btn">Run</button>
 
-    <div
-      style="
-        background-color: black;
-        color: greenyellow;
-        font-family: monospace;
-        font-size: 2em;
-        width: 100%;
-        height: 20vh;
-      "
-    >
-      <p>Output:</p>
-      <p id="output">&gt;&lt;</p>
+      <div
+        style="
+          background-color: black;
+          color: greenyellow;
+          font-family: monospace;
+          font-size: 2em;
+          width: 100%;
+          height: 20vh;
+        "
+      >
+        <p>Output:</p>
+        <p id="output">&gt;&lt;</p>
+      </div>
     </div>
   </body>
 </html>

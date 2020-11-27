@@ -1,9 +1,9 @@
-import { Statement } from "./Nodes";
+import { Statement } from './Nodes';
 
 export class CompilationUnit {
-  readonly statement:Statement;
-  
-  constructor(statement:Statement){
+  readonly statement: Statement;
+
+  constructor(statement: Statement) {
     this.statement = statement;
   }
 }

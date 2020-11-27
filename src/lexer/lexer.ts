@@ -10,7 +10,7 @@ class LexerPattern {
   }
 }
 
-const lexerPatterns: LexerPattern[] = [
+export const lexerPatterns: LexerPattern[] = [
   new LexerPattern(/^\s+/, TokenType.WhiteSpace),
   new LexerPattern(/^\/\/.*/, TokenType.Comment),
   new LexerPattern(/^\/\*[^(\*\/)]*\*\//, TokenType.Comment),
@@ -87,7 +87,7 @@ export default class Lexer {
     const badPosition = this.position;
     const badToken = new Token(badPosition, TokenType.BadChar, badChar);
     this.diagnostics.push(
-      new Diagnostic(badToken.getTextSpan(), `Bad character input: ${badChar}`),
+      new Diagnostic(badToken.textSpan, `Bad character input: ${badChar}`),
     );
     this.position++;
     return badToken;

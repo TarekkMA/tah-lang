@@ -69,7 +69,7 @@ export default class Parser {
     if (types.includes(this.current.type)) return this.nextToken();
     this.diagnostics.push(
       new Diagnostic(
-        this.current.getTextSpan(),
+        this.current.textSpan,
         `Unexpected token <${TokenFacts.getTypeName(
           this.current.type,
         )}>, expected ${types
@@ -140,7 +140,7 @@ export default class Parser {
     if (isReadonly && initializerPart == undefined) {
       this.diagnostics.push(
         new Diagnostic(
-          identifier.getTextSpan(),
+          identifier.textSpan,
           `"${identifier.text}" must have an initializer`,
         ),
       );
@@ -148,7 +148,7 @@ export default class Parser {
     if (initializerPart == undefined && asTypePart == undefined) {
       this.diagnostics.push(
         new Diagnostic(
-          identifier.getTextSpan(),
+          identifier.textSpan,
           `"${identifier.text}" must have a type or an initializer`,
         ),
       );
@@ -270,7 +270,7 @@ export default class Parser {
       default: {
         this.diagnostics.push(
           new Diagnostic(
-            this.current.getTextSpan(),
+            this.current.textSpan,
             `Unexpected token <${TokenFacts.getTypeName(this.current.type)}>.`,
           ),
         );

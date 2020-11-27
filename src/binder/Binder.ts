@@ -139,7 +139,7 @@ export class Binder {
       if (initializer != undefined && initializer.type != typeFromToken) {
         this.diagnostics.push(
           new Diagnostic(
-            statement.initializerPart!.equalsToken.getTextSpan(),
+            statement.initializerPart!.equalsToken.textSpan,
             `${
               VariableType[initializer.type]
             } cannot be assigned to a variable of type ${
@@ -159,7 +159,7 @@ export class Binder {
     if (!this.scope?.tryDeclare(variable)) {
       this.diagnostics.push(
         new Diagnostic(
-          statement.identifier.getTextSpan(),
+          statement.identifier.textSpan,
           `Variable with the name ${name} already declared`,
         ),
       );
@@ -260,7 +260,7 @@ export class Binder {
     if ((variable = this.scope?.tryLookup(name) ?? null) == null) {
       this.diagnostics.push(
         new Diagnostic(
-          expression.identifier.getTextSpan(),
+          expression.identifier.textSpan,
           `Cannot find a variable with the name ${name}.`,
         ),
       );
@@ -280,7 +280,7 @@ export class Binder {
     if ((variable = this.scope?.tryLookup(name) ?? null) == null) {
       this.diagnostics.push(
         new Diagnostic(
-          expression.identifier.getTextSpan(),
+          expression.identifier.textSpan,
           `Cannot find a variable with the name ${name}.`,
         ),
       );
@@ -290,7 +290,7 @@ export class Binder {
     if (variable.isReadOnly) {
       this.diagnostics.push(
         new Diagnostic(
-          expression.identifier.getTextSpan(),
+          expression.identifier.textSpan,
           `${name} is a read only variable.`,
         ),
       );
@@ -299,7 +299,7 @@ export class Binder {
     if (boundExpression.type != variable.type) {
       this.diagnostics.push(
         new Diagnostic(
-          expression.identifier.getTextSpan(),
+          expression.identifier.textSpan,
           `${
             VariableType[boundExpression.type]
           } cannot be assigned to a variable of type ${
@@ -323,7 +323,7 @@ export class Binder {
     if (boundOperator == null) {
       this.diagnostics.push(
         new Diagnostic(
-          expression.operator.getTextSpan(),
+          expression.operator.textSpan,
           `Unary operator '${
             expression.operator.text
           }' is not defined for type ${VariableType[boundOperand.type]}.`,
@@ -348,7 +348,7 @@ export class Binder {
     if (boundOperator == null) {
       this.diagnostics.push(
         new Diagnostic(
-          expression.oprator.getTextSpan(),
+          expression.oprator.textSpan,
           `Binary operator '${
             expression.oprator.text
           }' is not defined for types ${VariableType[boundLeft.type]} and ${
