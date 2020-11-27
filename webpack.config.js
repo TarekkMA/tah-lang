@@ -11,7 +11,8 @@ const config = {
   entry: './webapp/index.ts',
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'tah-main.js',
+    filename: 'js/[name].[chunkhash:8].js',
+    publicPath: '/tah-lang',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -41,6 +42,17 @@ const config = {
   },
   resolve: {
     extensions: ['.ts', '.js'],
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/i,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    },
   },
 };
 
