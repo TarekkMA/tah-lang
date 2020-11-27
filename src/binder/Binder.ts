@@ -204,7 +204,7 @@ export class Binder {
       this.diagnostics.push(
         new Diagnostic(
           expression.textSpan,
-          `exptexted the expression to evaluate to ${
+          `expected the expression to evaluate to ${
             VariableType[expectedType]
           } but it did evaluate to ${VariableType[boundExpression.type]}.`,
         ),
