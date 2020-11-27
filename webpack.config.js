@@ -1,4 +1,3 @@
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -20,10 +19,6 @@ const config = (env) => {
     plugins: [
       new HtmlWebpackPlugin({
         template: './webapp/index.html',
-      }),
-      new MonacoWebpackPlugin({
-        languages: [],
-        customLanguages: ['tah'],
       }),
       new webpack.ProvidePlugin({
         $: 'jquery',

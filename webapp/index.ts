@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Compilation } from '../src/Compilation';
 import SyntaxTree from '../src/parser/SyntaxTree';
-import { editorSetup } from './editor-setup';
-
+import * as CodeMirror from 'codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/darcula.css';
 import 'jstree/dist/themes/default/style.min.css';
+
 import 'jstree';
 import { AstNode } from '../src/visualization/ast';
 import { TextSpan } from '../src/TextSpan';
 
-editorSetup();
+import { whileExample } from './code-examples';
 
 const runButton = document.getElementById('run-btn')!;
 const output = document.getElementById('output')!;
 
-const editor = monaco.editor.create(document.getElementById('vseditor')!, {
-  value: '{\nvar x as number = 55\n\nwhile x < 50\n\tx = x + 8\n\nx\n}',
-  language: 'tah',
-  theme: 'tah-theme',
+const editor = CodeMirror(document.getElementById('vseditor')!, {
+  value: whileExample,
+  lineNumbers: true,
+  theme: 'darcula',
 });
 
 runButton.onclick = function () {
