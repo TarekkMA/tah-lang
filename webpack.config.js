@@ -15,7 +15,7 @@ const config = (env) => {
     output: {
       path: path.resolve(__dirname, 'build'),
       filename: 'js/[name].[chunkhash:8].js',
-      publicPath: isProd ? '/tah-lang' : '/',
+      publicPath: isProd ? '/tah-lang/' : '/',
     },
     plugins: [
       new HtmlWebpackPlugin({
