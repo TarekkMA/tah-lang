@@ -7,7 +7,7 @@ const runButton = document.getElementById('run-btn')!;
 const output = document.getElementById('output')!;
 
 const editor = monaco.editor.create(document.getElementById('vseditor')!, {
-  value: 'console.log("Hello, world")',
+  value: '{\nvar x as number = 55\n\nwhile x < 50\n\tx = x + 8\n\nx\n}',
 });
 
 runButton.onclick = function () {
