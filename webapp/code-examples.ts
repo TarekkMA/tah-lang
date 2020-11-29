@@ -13,5 +13,6 @@ export const whileExample = `/**
     x = x + 8
   
   x /*Result should be 57.7*/
+  "hello" + " " + "Tarek"
 }
 `;

@@ -158,6 +158,8 @@ export class Evaluator {
         return leftValue <= rightValue;
       case BoundBinaryOperatorKind.GreaterThanOrEqualsTo:
         return leftValue >= rightValue;
+      case BoundBinaryOperatorKind.Concatination:
+        return leftValue + rightValue;
       default:
         throw new Error(
           `Unexpected unary operator ${

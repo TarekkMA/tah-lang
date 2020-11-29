@@ -14,6 +14,7 @@ export enum BoundBinaryOperatorKind {
   LessThanOrEqualsTo,
   GreaterThan,
   GreaterThanOrEqualsTo,
+  Concatination,
 }
 
 export class BoundBinaryOperator {
@@ -155,6 +156,14 @@ export class BoundBinaryOperator {
       VariableType.Boolean,
       VariableType.Boolean,
       VariableType.Boolean,
+    ),
+
+    new BoundBinaryOperator(
+      TokenType.Plus,
+      BoundBinaryOperatorKind.Concatination,
+      VariableType.String,
+      VariableType.String,
+      VariableType.String,
     ),
   ];
 }
