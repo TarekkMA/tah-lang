@@ -13,6 +13,18 @@ import { TextSpan } from '../src/TextSpan';
 import { whileExample } from './code-examples';
 import { defineTahMode, tahModeName } from './tah-mode';
 
+import Split from 'split.js';
+
+Split(['#top-panel', '#bottom-panel'], {
+  direction: 'vertical',
+  sizes: [75, 25],
+});
+
+Split(['#vseditor', '#ast_cont'], {
+  direction: 'horizontal',
+  sizes: [75, 25],
+});
+
 const runButton = document.getElementById('run-btn')!;
 const output = document.getElementById('output')!;
 
@@ -26,6 +38,7 @@ const editor = CodeMirror(document.getElementById('vseditor')!, {
   theme: 'darcula',
   mode: tahModeName,
   tabSize: 2,
+  viewportMargin: Infinity,
 });
 
 editor.on('change', () => {

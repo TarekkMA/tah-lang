@@ -6,29 +6,41 @@
     <title>Tah Lang</title>
   </head>
   <body>
-    <div style="display: flex">
-      <div id="vseditor" style="width: 50%; min-height: 50vh"></div>
+    <div style="width: 100%; height: 100%; overflow: hidden">
+      <div id="top-panel" style="display: flex">
+        <div id="vseditor" style="height: auto"></div>
 
-      <div>
-        AST:
-        <div id="ast"></div>
+        <div id="ast_cont" style="overflow: scroll">
+          AST:
+          <div id="ast"></div>
+        </div>
       </div>
-    </div>
-    <div style="clear: both">
-      <button id="run-btn">Run</button>
-
-      <div
-        style="
-          background-color: black;
-          color: greenyellow;
-          font-family: monospace;
-          font-size: 2em;
-          width: 100%;
-          height: 20vh;
-        "
-      >
-        <p>Output:</p>
-        <p id="output">&gt;&lt;</p>
+      <div id="bottom-panel">
+        <button
+          id="run-btn"
+          style="
+            width: 10%;
+            font-size: 1.5em;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+          "
+        >
+          Run
+        </button>
+        <div
+          style="
+            background-color: black;
+            color: greenyellow;
+            font-family: monospace;
+            font-size: 2em;
+            width: 100%;
+            height: 100%;
+          "
+        >
+          Output:
+          <p id="output">&gt;&lt;</p>
+        </div>
       </div>
     </div>
   </body>

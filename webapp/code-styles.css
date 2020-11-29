@@ -1,5 +1,35 @@
+body {
+  margin: 0;
+}
+
 .cm-red_wavy_line {
   background: url(https://try.kotlinlang.org/static/images/wavyline-red.gif)
     repeat-x 100% 100%;
   padding-bottom: 2px;
+}
+
+.gutter {
+  background-color: #eee;
+
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter.gutter-horizontal {
+  background-image: url('img/vertical.png');
+  cursor: col-resize;
+}
+
+.gutter.gutter-vertical {
+  background-image: url('img/horizontal.png');
+  cursor: row-resize;
+}
+.CodeMirror {
+  border: 1px solid #eee;
+  height: 100%;
+}
+
+html,
+body {
+  height: 100%;
 }

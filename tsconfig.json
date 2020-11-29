@@ -8,7 +8,8 @@
     //"strict": true,
     //"alwaysStrict": true,
     //"noImplicitAny": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules", "**/*.spec.ts", "build/**/*"]
 }
