@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "prod:build": "webpack --env PROD=true",
-    "dev:serve": "webpack serve"
+    "dev:serve": "webpack serve",
+    "ghpages:deploy" : "npm run prod:build && gh-pages -d build"
   },
   "dependencies": {
     "@types/node": "^14.14.9",
