@@ -5,20 +5,25 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/darcula.css';
 import 'jstree/dist/themes/default/style.min.css';
-
+import './code-styles.css';
 import 'jstree';
 import { AstNode } from '../src/visualization/ast';
 import { TextSpan } from '../src/TextSpan';
 
 import { whileExample } from './code-examples';
+import { defineTahMode, tahModeName } from './tah-mode';
 
 const runButton = document.getElementById('run-btn')!;
 const output = document.getElementById('output')!;
+
+defineTahMode();
 
 const editor = CodeMirror(document.getElementById('vseditor')!, {
   value: whileExample,
   lineNumbers: true,
   theme: 'darcula',
+  mode: tahModeName,
+  tabSize: 2,
 });
 
 runButton.onclick = function () {

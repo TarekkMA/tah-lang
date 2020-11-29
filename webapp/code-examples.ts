@@ -1,5 +1,6 @@
 export const whileExample = `//This is a simple example illustrating how you can use tah-lang
 {
+  val a as string = "this is a const string"
   var x as number = 1
 
   

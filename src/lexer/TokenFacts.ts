@@ -71,4 +71,8 @@ export class TokenFacts {
       TokenType.PipePipe,
     ];
   }
+
+  static getAllOpertors(): TokenType[] {
+    return this.getBinaryOpertors().concat(this.getUnaryOpertors());
+  }
 }
