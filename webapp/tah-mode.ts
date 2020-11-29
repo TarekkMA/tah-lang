@@ -5,15 +5,10 @@ import { TokenFacts } from '../src/lexer/TokenFacts';
 
 export const tahModeName = 'tah';
 
-interface TahModeState {}
-
 export function defineTahMode(): void {
-  CodeMirror.defineMode<TahModeState>(tahModeName, () => {
+  CodeMirror.defineMode(tahModeName, () => {
     return {
       name: 'tah',
-      startState: () => {
-        return {};
-      },
       token: (stream) => {
         for (let i = 0; i < lexerPatterns.length; i++) {
           const pattern = lexerPatterns[i];
