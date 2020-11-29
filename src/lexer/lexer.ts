@@ -13,7 +13,7 @@ class LexerPattern {
 export const lexerPatterns: LexerPattern[] = [
   new LexerPattern(/^\s+/, TokenType.WhiteSpace),
   new LexerPattern(/^\/\/.*/, TokenType.Comment),
-  new LexerPattern(/^\/\*[^(\*\/)]*\*\//, TokenType.Comment),
+  new LexerPattern(/^\/\*((.|\s)*?)\*\//, TokenType.Comment),
   new LexerPattern(/^[0-9]+(\.[0-9]+){0,1}/, TokenType.Number),
   new LexerPattern(/^var/, TokenType.VarKeyword),
   new LexerPattern(/^val/, TokenType.ValKeyword),

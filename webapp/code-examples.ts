@@ -1,4 +1,9 @@
-export const whileExample = `//This is a simple example illustrating how you can use tah-lang
+export const whileExample = `/**
+* You can edit and run this code. 
+* Tah Lang by TarekkMA
+*/
+
+//This is a simple example illustrating how you can use tah-lang
 {
   val a as string = "this is a const string"
   var x as number = 1
