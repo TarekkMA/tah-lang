@@ -16,6 +16,8 @@ import { defineTahMode, tahModeName } from './tah-mode';
 const runButton = document.getElementById('run-btn')!;
 const output = document.getElementById('output')!;
 
+const marks: CodeMirror.TextMarker[] = [];
+
 defineTahMode();
 
 const editor = CodeMirror(document.getElementById('vseditor')!, {
@@ -26,9 +28,15 @@ const editor = CodeMirror(document.getElementById('vseditor')!, {
   tabSize: 2,
 });
 
+editor.on('change', () => {
+  if (marks.length != 0) {
+    marks.forEach((m) => m.clear());
+    marks.length = 0;
+  }
+});
+
 runButton.onclick = function () {
   const codeString = editor.getValue();
-  console.log(codeString, 'nov');
   const variables = new Map();
   const syntaxTree = SyntaxTree.parse(codeString);
   showAst(syntaxTree);
@@ -36,10 +44,49 @@ runButton.onclick = function () {
   const result = compilation.evaluate(variables);
   if (result.diagnostics.length > 0) {
     output.innerHTML = result.diagnostics.join('<br>');
+    result.diagnostics.forEach((d) => {
+      const { from, to } = textSpanToStartLEndL(d.span, codeString);
+      console.log(from, to);
+      const mark = editor.markText(from, to, { className: 'cm-red_wavy_line' });
+      marks.push(mark);
+    });
   } else {
     output.innerHTML = result.value;
   }
 };
+
+function textSpanToStartLEndL(
+  span: TextSpan,
+  sourceText: string,
+): { from: CodeMirror.Position; to: CodeMirror.Position } {
+  console.log(sourceText.substr(span.start, span.length));
+  return {
+    from: getLineCharFromPos(span.start, sourceText),
+    to: getLineCharFromPos(span.end, sourceText),
+  };
+}
+
+function getLineCharFromPos(
+  pos: number,
+  sourceText: string,
+): CodeMirror.Position {
+  let linesIndex = 0;
+  let charIndex = 0;
+
+  for (let i = 0; i < pos; i++) {
+    const char = sourceText[i];
+    if (char == '\n') {
+      linesIndex++;
+      charIndex = 0;
+    } else {
+      charIndex++;
+    }
+  }
+  return {
+    line: linesIndex,
+    ch: charIndex,
+  };
+}
 
 function showAst(syntaxTree: SyntaxTree) {
   $('#ast').jstree({
