@@ -165,6 +165,13 @@ export class BoundBinaryOperator {
       VariableType.String,
       VariableType.String,
     ),
+    new BoundBinaryOperator(
+      TokenType.EqualEqual,
+      BoundBinaryOperatorKind.Equals,
+      VariableType.String,
+      VariableType.String,
+      VariableType.Boolean,
+    ),
   ];
 }
 
