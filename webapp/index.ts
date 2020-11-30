@@ -15,6 +15,10 @@ import { defineTahMode, tahModeName } from './tah-mode';
 
 import Split from 'split.js';
 
+interface Dictionary<T> {
+  [Key: string]: T;
+}
+
 Split(['#top-panel', '#bottom-panel'], {
   direction: 'vertical',
   sizes: [75, 25],
@@ -28,7 +32,10 @@ Split(['#vseditor', '#ast_cont'], {
 const runButton = document.getElementById('run-btn')!;
 const output = document.getElementById('output')!;
 
-const marks: CodeMirror.TextMarker[] = [];
+const errorMarks: CodeMirror.TextMarker[] = [];
+
+const astHighlightMark: Map<string, CodeMirror.TextMarker> = new Map();
+const astSpans: Map<string, TextSpan | undefined> = new Map();
 
 defineTahMode();
 
@@ -42,9 +49,9 @@ const editor = CodeMirror(document.getElementById('vseditor')!, {
 });
 
 editor.on('change', () => {
-  if (marks.length != 0) {
-    marks.forEach((m) => m.clear());
-    marks.length = 0;
+  if (errorMarks.length != 0) {
+    errorMarks.forEach((m) => m.clear());
+    errorMarks.length = 0;
   }
 });
 
@@ -59,9 +66,8 @@ runButton.onclick = function () {
     output.innerHTML = result.diagnostics.join('<br>');
     result.diagnostics.forEach((d) => {
       const { from, to } = textSpanToStartLEndL(d.span, codeString);
-      console.log(from, to);
       const mark = editor.markText(from, to, { className: 'cm-red_wavy_line' });
-      marks.push(mark);
+      errorMarks.push(mark);
     });
   } else {
     output.innerHTML = result.value;
@@ -72,7 +78,6 @@ function textSpanToStartLEndL(
   span: TextSpan,
   sourceText: string,
 ): { from: CodeMirror.Position; to: CodeMirror.Position } {
-  console.log(sourceText.substr(span.start, span.length));
   return {
     from: getLineCharFromPos(span.start, sourceText),
     to: getLineCharFromPos(span.end, sourceText),
@@ -102,13 +107,38 @@ function getLineCharFromPos(
 }
 
 function showAst(syntaxTree: SyntaxTree) {
-  $('#ast').jstree({
-    core: {
-      data: [astNodeToJsTreeData(syntaxTree)],
-    },
-  });
+  astSpans.clear();
+  astHighlightMark.forEach((value) => value.clear());
+  astHighlightMark.clear();
+  $('#ast')
+    .on('hover_node.jstree', (_, node) => {
+      highlightAstSpan(node);
+    })
+    .on('dehover_node.jstree', (_, node) => {
+      highlightAstSpan(node, true);
+    })
+    .jstree({
+      core: {
+        data: [astNodeToJsTreeData(syntaxTree)],
+      },
+    });
 }
 
+function highlightAstSpan(
+  node: any /*jstree event node type*/,
+  remove = false,
+) {
+  node = node.node;
+  const id = node.id;
+  const span = astSpans.get(id);
+  if (!span) return;
+  astHighlightMark.get(id)?.clear();
+  if (remove) return;
+  const codeString = editor.getValue();
+  const { from, to } = textSpanToStartLEndL(span, codeString);
+  const mark = editor.markText(from, to, { className: 'ast_highlighted' });
+  astHighlightMark.set(id, mark);
+}
 interface JsTreeData {
   [x: string]: any;
   text: string;
@@ -140,9 +170,12 @@ function textSpanToJsTreeData(span: TextSpan): JsTreeData {
 }
 
 function astNodeToJsTreeData(node: AstNode): JsTreeData {
+  const id = uuidv4();
+  astSpans.set(id, node.textSpan);
   return {
     text: node.name,
     icon: false,
+    id: id,
     children: [
       textSpanToJsTreeData(node.textSpan!),
       ...(astNodesToJsTreeData(node.children) || []),
@@ -154,4 +187,12 @@ function astNodesToJsTreeData(
 ): JsTreeData[] | undefined {
   if (nodes == undefined) return undefined;
   return nodes.map(astNodeToJsTreeData);
+}
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
