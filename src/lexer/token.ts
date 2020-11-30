@@ -72,7 +72,7 @@ export class Token implements AstNode {
     return undefined;
   }
   get textSpan(): TextSpan {
-    return new TextSpan(this.position, this.text?.length || 0);
+    return TextSpan.fromStartLength(this.position, this.text?.length || 0);
   }
 
   public toString(): string {

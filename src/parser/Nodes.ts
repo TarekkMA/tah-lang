@@ -10,7 +10,7 @@ export abstract class SyntaxNode implements AstNode {
 
 export abstract class Expression extends SyntaxNode {}
 export class ExpressionStub extends Expression {
-  readonly textSpan = new TextSpan(0, 0);
+  readonly textSpan = TextSpan.fromStartLength(0, 0);
   readonly name = 'ExpressionStub';
 
   public get children(): AstNode[] | undefined {
@@ -62,7 +62,10 @@ export class BinaryExpression extends Expression {
   readonly name = 'BinaryExpression';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(this.left.textSpan.start, this.right.textSpan.end);
+    return TextSpan.fromStartEnd(
+      this.left.textSpan.start,
+      this.right.textSpan.end,
+    );
   }
   constructor(
     readonly left: Expression,
@@ -81,7 +84,7 @@ export class UnaryExpression extends Expression {
   readonly name = 'UnaryExpression';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.operator.textSpan.start,
       this.operand.textSpan.end,
     );
@@ -99,7 +102,7 @@ export class ParenthesizedExpression extends Expression {
   readonly name = 'ParenthesizedExpression';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.openParenthesisToken.textSpan.start,
       this.openParenthesisToken.textSpan.end,
     );
@@ -125,7 +128,7 @@ export class AssignmentExpression extends Expression {
   readonly name = 'AssignmentExpression';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.identifier.textSpan.start,
       this.expression.textSpan.end,
     );
@@ -162,7 +165,7 @@ export class BlockStatement extends Statement {
   readonly name = 'BlockStatement';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.openBraceToken.textSpan.start,
       this.closeBraceToken.textSpan.end,
     );
@@ -204,7 +207,7 @@ export class VariableDeclarationStatement extends Statement {
       this.initializerPart?.textSpan.end ||
       this.asTypePart?.textSpan.end ||
       this.identifier.textSpan.end;
-    return new TextSpan(start, end);
+    return TextSpan.fromStartEnd(start, end);
   }
   constructor(
     readonly keywordToken: Token,
@@ -227,7 +230,7 @@ export class VariableDeclarationInitalizerPart extends SyntaxNode {
   readonly name = 'VariableDeclarationInitalizerPart';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.equalsToken.textSpan.start,
       this.initializer.textSpan.end,
     );
@@ -244,7 +247,7 @@ export class VariableDeclarationAsTypePart extends SyntaxNode {
   readonly name = 'VariableDeclarationAsTypePart';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.asKeywordToken.textSpan.start,
       this.typeToken.textSpan.end,
     );
@@ -262,7 +265,7 @@ export class IfStatement extends Statement {
   readonly name = 'IfStatement';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.ifKeyword.textSpan.start,
       this.elseClause?.textSpan.end || this.thenStatement.textSpan.end,
     );
@@ -287,7 +290,7 @@ export class ElseClause extends SyntaxNode {
   readonly name = 'ElseClause';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.elseKeyword.textSpan.start,
       this.elseStatement.textSpan.end,
     );
@@ -305,7 +308,7 @@ export class WhileStatement extends Statement {
   readonly name = 'WhileStatement';
 
   public get textSpan(): TextSpan {
-    return new TextSpan(
+    return TextSpan.fromStartEnd(
       this.whileKeyword.textSpan.start,
       this.body.textSpan.end,
     );

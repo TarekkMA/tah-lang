@@ -15,9 +15,18 @@ import { defineTahMode, tahModeName } from './tah-mode';
 
 import Split from 'split.js';
 
-interface Dictionary<T> {
-  [Key: string]: T;
-}
+$('#ast')
+  .on('hover_node.jstree', (_, node) => {
+    highlightAstSpan(node);
+  })
+  .on('dehover_node.jstree', (_, node) => {
+    highlightAstSpan(node, true);
+  })
+  .jstree({
+    core: {
+      data: [],
+    },
+  });
 
 Split(['#top-panel', '#bottom-panel'], {
   direction: 'vertical',
@@ -110,18 +119,10 @@ function showAst(syntaxTree: SyntaxTree) {
   astSpans.clear();
   astHighlightMark.forEach((value) => value.clear());
   astHighlightMark.clear();
-  $('#ast')
-    .on('hover_node.jstree', (_, node) => {
-      highlightAstSpan(node);
-    })
-    .on('dehover_node.jstree', (_, node) => {
-      highlightAstSpan(node, true);
-    })
-    .jstree({
-      core: {
-        data: [astNodeToJsTreeData(syntaxTree)],
-      },
-    });
+  $('#ast').jstree(true).settings!.core.data = [
+    astNodeToJsTreeData(syntaxTree),
+  ];
+  $('#ast').jstree(true).refresh();
 }
 
 function highlightAstSpan(
@@ -177,7 +178,7 @@ function astNodeToJsTreeData(node: AstNode): JsTreeData {
     icon: false,
     id: id,
     children: [
-      textSpanToJsTreeData(node.textSpan!),
+      //textSpanToJsTreeData(node.textSpan!),
       ...(astNodesToJsTreeData(node.children) || []),
     ],
   };
