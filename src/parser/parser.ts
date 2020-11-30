@@ -109,7 +109,14 @@ export default class Parser {
       [TokenType.EndOfFile, TokenType.CloseBrace].includes(this.current.type) ==
       false
     ) {
+      const startToken = this.current;
       const statement = this.parseStatement();
+
+      if (this.current == startToken) {
+        this.nextToken();
+        continue;
+      }
+
       statements.push(statement);
     }
     const closeBraceToken = this.matchToken(TokenType.CloseBrace);
@@ -250,10 +257,6 @@ export default class Parser {
           token,
         );
       }
-      case TokenType.Identifier: {
-        const token = this.matchToken(TokenType.Identifier);
-        return new NameExpression(token);
-      }
       case TokenType.Number: {
         const numberToken = this.matchToken(TokenType.Number);
         const numberValue = Number(numberToken.text);
@@ -267,14 +270,17 @@ export default class Parser {
         );
         return new StringLiteralExpression(stringValue, stringToken);
       }
+      case TokenType.Identifier:
       default: {
-        this.diagnostics.push(
-          new Diagnostic(
-            this.current.textSpan,
-            `Unexpected token <${TokenFacts.getTypeName(this.current.type)}>.`,
-          ),
-        );
-        return new ExpressionStub();
+        const token = this.matchToken(TokenType.Identifier);
+        return new NameExpression(token);
+        // this.diagnostics.push(
+        //   new Diagnostic(
+        //     this.current.textSpan,
+        //     `Unexpected token <${TokenFacts.getTypeName(this.current.type)}>.`,
+        //   ),
+        // );
+        // return new ExpressionStub();
       }
     }
   }
