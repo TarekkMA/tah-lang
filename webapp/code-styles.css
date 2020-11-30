@@ -9,7 +9,7 @@ body {
 }
 
 .gutter {
-  background-color: #eee;
+  background-color: #434649;
 
   background-repeat: no-repeat;
   background-position: 50%;
@@ -25,7 +25,6 @@ body {
   cursor: row-resize;
 }
 .CodeMirror {
-  border: 1px solid #eee;
   height: 100%;
 }
 
