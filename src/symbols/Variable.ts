@@ -1,4 +1,4 @@
-import { TokenType } from './lexer/token';
+import { TokenType } from '../lexer/token';
 
 export enum VariableType {
   Number,

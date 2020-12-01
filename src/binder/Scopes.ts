@@ -1,5 +1,5 @@
 import { Diagnostic } from '../Diagnostic';
-import { VariableSymbol } from '../Variable';
+import { VariableSymbol } from '../symbols/Variable';
 import { BoundStatement } from './BoundNodes';
 
 export class BoundGlobalScope {

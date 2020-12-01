@@ -23,7 +23,7 @@ import {
   VariableSymbol,
   VariableType,
   variableTypeFromTokenType,
-} from '../Variable';
+} from '../symbols/Variable';
 import {
   BoundAssignmentExpression,
   BoundBinaryExpression,

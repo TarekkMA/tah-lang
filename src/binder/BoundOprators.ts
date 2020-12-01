@@ -1,5 +1,5 @@
 import { TokenType } from '../lexer/token';
-import { VariableType } from '../Variable';
+import { VariableType } from '../symbols/Variable';
 
 export enum BoundBinaryOperatorKind {
   Addition,

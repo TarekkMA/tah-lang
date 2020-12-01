@@ -3,7 +3,7 @@ import { BoundGlobalScope } from './binder/Scopes';
 import { Diagnostic } from './Diagnostic';
 import { Evaluator } from './evaluator/Evaluator';
 import SyntaxTree from './parser/SyntaxTree';
-import { VariableSymbol } from './Variable';
+import { VariableSymbol } from './symbols/Variable';
 
 export class EvaluationResult {
   constructor(
