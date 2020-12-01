@@ -1,5 +1,5 @@
 import { VariableSymbol } from '../symbols/VariableSymbol';
-import { TypeSymbol } from "../symbols/TypeSymbol";
+import { TypeSymbol } from '../symbols/TypeSymbol';
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
 
 export abstract class BoundNode {}

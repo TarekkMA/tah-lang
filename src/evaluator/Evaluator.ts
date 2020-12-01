@@ -16,11 +16,6 @@ import {
   BoundBinaryOperatorKind,
   BoundUnaryOperatorKind,
 } from '../binder/BoundOprators';
-import {
-  AssignmentExpression,
-  Expression,
-  ExpressionStatement,
-} from '../parser/Nodes';
 import { VariableSymbol } from '../symbols/VariableSymbol';
 
 export class Evaluator {
