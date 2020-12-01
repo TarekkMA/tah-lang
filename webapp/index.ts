@@ -39,7 +39,6 @@ Split(['#vseditor', '#ast_cont'], {
 });
 
 const runButton = document.getElementById('run-btn')!;
-const output = document.getElementById('output')!;
 
 const errorMarks: CodeMirror.TextMarker[] = [];
 
@@ -57,6 +56,12 @@ const editor = CodeMirror(document.getElementById('vseditor')!, {
   viewportMargin: Infinity,
 });
 
+const output = document.getElementById('output')! as HTMLTextAreaElement;
+
+output.onkeypress = function (e) {
+  console.log(e);
+};
+
 editor.on('change', () => {
   if (errorMarks.length != 0) {
     errorMarks.forEach((m) => m.clear());
@@ -71,15 +76,16 @@ runButton.onclick = function () {
   showAst(syntaxTree);
   const compilation = new Compilation(syntaxTree);
   const result = compilation.evaluate(variables);
+  output.value = 'Output:\n\n';
   if (result.diagnostics.length > 0) {
-    output.innerHTML = result.diagnostics.join('<br>');
+    output.value += result.diagnostics.join('\n');
     result.diagnostics.forEach((d) => {
       const { from, to } = textSpanToStartLEndL(d.span, codeString);
       const mark = editor.markText(from, to, { className: 'cm-red_wavy_line' });
       errorMarks.push(mark);
     });
   } else {
-    output.innerHTML = result.value;
+    output.value += result.value;
   }
 };
 
