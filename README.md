@@ -1,8 +1,9 @@
 # لغة الـ ط
 
-Tah is a language that can be compiled/evaluated in the browser.
+Tah is a language that can be compiled/evaluated in the browser. Tah is mainly built so I can undersatnd how compilers are built.
 
 Check out the live web app at: https://tarekkma.github.io/tah-lang/
+
 ## Types
 
 - Number `var a as number;`
