@@ -1,11 +1,11 @@
 import { VariableSymbol } from '../symbols/VariableSymbol';
-import { VariableType } from "../symbols/TypeSymbol";
+import { TypeSymbol } from "../symbols/TypeSymbol";
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
 
 export abstract class BoundNode {}
 
 export abstract class BoundExpression {
-  abstract readonly type: VariableType;
+  abstract readonly type: TypeSymbol;
 }
 
 export abstract class BoundStatement {}
@@ -19,28 +19,28 @@ export abstract class BoundLiteralExpression<T> extends BoundExpression {
 }
 
 export class BoundStringLiteralExpression extends BoundLiteralExpression<string> {
-  readonly type = VariableType.String;
+  readonly type = TypeSymbol.String;
   constructor(value: string) {
     super(value);
   }
 }
 
 export class BoundNumberLiteralExpression extends BoundLiteralExpression<number> {
-  readonly type = VariableType.Number;
+  readonly type = TypeSymbol.Number;
   constructor(value: number) {
     super(value);
   }
 }
 
 export class BoundBooleanLiteral extends BoundLiteralExpression<boolean> {
-  readonly type = VariableType.Boolean;
+  readonly type = TypeSymbol.Boolean;
   constructor(value: boolean) {
     super(value);
   }
 }
 
 export class BoundBinaryExpression extends BoundExpression {
-  public get type(): VariableType {
+  public get type(): TypeSymbol {
     return this.operator.resultType;
   }
 
@@ -61,7 +61,7 @@ export class BoundBinaryExpression extends BoundExpression {
 }
 
 export class BoundUnaryExpression extends BoundExpression {
-  public get type(): VariableType {
+  public get type(): TypeSymbol {
     return this.oprator.resultType;
   }
   constructor(
@@ -73,7 +73,7 @@ export class BoundUnaryExpression extends BoundExpression {
 }
 
 export class BoundAssignmentExpression extends BoundExpression {
-  public get type(): VariableType {
+  public get type(): TypeSymbol {
     return this.expression.type;
   }
   readonly variable: VariableSymbol;
@@ -86,7 +86,7 @@ export class BoundAssignmentExpression extends BoundExpression {
 }
 
 export class BoundVariableExpression extends BoundExpression {
-  public get type(): VariableType {
+  public get type(): TypeSymbol {
     return this.variable.type;
   }
   readonly variable: VariableSymbol;

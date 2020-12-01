@@ -19,13 +19,8 @@ import {
   VariableDeclarationStatement,
   WhileStatement,
 } from '../parser/Nodes';
-import {
-  VariableSymbol,
-} from '../symbols/VariableSymbol';
-import {
-  VariableType,
-  variableTypeFromTokenType
-} from "../symbols/TypeSymbol";
+import { VariableSymbol } from '../symbols/VariableSymbol';
+import { TypeSymbol, typeSymbolFromTokenType } from '../symbols/TypeSymbol';
 import {
   BoundAssignmentExpression,
   BoundBinaryExpression,
@@ -131,10 +126,10 @@ export class Binder {
       ? this.bindExpression(statement.initializerPart.initializer)
       : undefined;
 
-    let type: VariableType;
+    let type: TypeSymbol;
 
     if (statement.asTypePart != undefined) {
-      const typeFromToken = variableTypeFromTokenType(
+      const typeFromToken = typeSymbolFromTokenType(
         statement.asTypePart.typeToken.type,
       );
 
@@ -142,11 +137,7 @@ export class Binder {
         this.diagnostics.push(
           new Diagnostic(
             statement.initializerPart!.equalsToken.textSpan,
-            `${
-              VariableType[initializer.type]
-            } cannot be assigned to a variable of type ${
-              VariableType[typeFromToken]
-            }`,
+            `${initializer.type.name} cannot be assigned to a variable of type ${typeFromToken.name}`,
           ),
         );
       }
@@ -180,7 +171,7 @@ export class Binder {
   private bindIfStatement(statement: IfStatement): BoundIfStatement {
     const boundCondition = this.bindExpressionWithExpectedType(
       statement.condition,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
     );
     const boundThen = this.bindStatement(statement.thenStatement);
     const boundElse = !statement.elseClause
@@ -191,7 +182,7 @@ export class Binder {
   private bindWhileStatement(statement: WhileStatement): BoundWhileStatement {
     const boundCondition = this.bindExpressionWithExpectedType(
       statement.condition,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
     );
     const boundBody = this.bindStatement(statement.body);
     return new BoundWhileStatement(boundCondition, boundBody);
@@ -199,16 +190,14 @@ export class Binder {
 
   private bindExpressionWithExpectedType(
     expression: Expression,
-    expectedType: VariableType,
+    expectedType: TypeSymbol,
   ): BoundExpression {
     const boundExpression = this.bindExpression(expression);
     if (boundExpression.type != expectedType) {
       this.diagnostics.push(
         new Diagnostic(
           expression.textSpan,
-          `expected the expression to evaluate to ${
-            VariableType[expectedType]
-          } but it did evaluate to ${VariableType[boundExpression.type]}.`,
+          `expected the expression to evaluate to ${expectedType.name} but it did evaluate to ${boundExpression.type.name}.`,
         ),
       );
     }
@@ -302,11 +291,7 @@ export class Binder {
       this.diagnostics.push(
         new Diagnostic(
           expression.identifier.textSpan,
-          `${
-            VariableType[boundExpression.type]
-          } cannot be assigned to a variable of type ${
-            VariableType[variable.type]
-          }`,
+          `${boundExpression.type.name} cannot be assigned to a variable of type ${variable.type.name}`,
         ),
       );
       return boundExpression;
@@ -326,9 +311,7 @@ export class Binder {
       this.diagnostics.push(
         new Diagnostic(
           expression.operator.textSpan,
-          `Unary operator '${
-            expression.operator.text
-          }' is not defined for type ${VariableType[boundOperand.type]}.`,
+          `Unary operator '${expression.operator.text}' is not defined for type ${boundOperand.type.name}.`,
         ),
       );
       return boundOperand;
@@ -351,11 +334,7 @@ export class Binder {
       this.diagnostics.push(
         new Diagnostic(
           expression.oprator.textSpan,
-          `Binary operator '${
-            expression.oprator.text
-          }' is not defined for types ${VariableType[boundLeft.type]} and ${
-            VariableType[boundRight.type]
-          }.`,
+          `Binary operator '${expression.oprator.text}' is not defined for types ${boundLeft.type.name} and ${boundRight.type.name}.`,
         ),
       );
       return boundLeft;

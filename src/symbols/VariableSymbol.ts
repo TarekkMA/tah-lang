@@ -1,11 +1,11 @@
 import { Symbol } from './Symbol';
-import { VariableType } from './TypeSymbol';
+import { TypeSymbol } from './TypeSymbol';
 
 export class VariableSymbol extends Symbol {
   constructor(
     readonly isReadOnly: boolean,
     readonly name: string,
-    readonly type: VariableType,
+    readonly type: TypeSymbol,
   ) {
     super(name);
   }

@@ -1,5 +1,5 @@
 import { TokenType } from '../lexer/token';
-import { VariableType } from "../symbols/TypeSymbol";
+import { TypeSymbol } from "../symbols/TypeSymbol";
 
 export enum BoundBinaryOperatorKind {
   Addition,
@@ -20,16 +20,16 @@ export enum BoundBinaryOperatorKind {
 export class BoundBinaryOperator {
   readonly operatorTokenType: TokenType;
   readonly kind: BoundBinaryOperatorKind;
-  readonly leftType: VariableType;
-  readonly resultType: VariableType;
-  readonly rightType: VariableType;
+  readonly leftType: TypeSymbol;
+  readonly resultType: TypeSymbol;
+  readonly rightType: TypeSymbol;
 
   private constructor(
     operatorTokenType: TokenType,
     kind: BoundBinaryOperatorKind,
-    leftType: VariableType,
-    rightType: VariableType,
-    resultType: VariableType,
+    leftType: TypeSymbol,
+    rightType: TypeSymbol,
+    resultType: TypeSymbol,
   ) {
     this.operatorTokenType = operatorTokenType;
     this.kind = kind;
@@ -40,8 +40,8 @@ export class BoundBinaryOperator {
 
   static tryBind(
     operatorTokenType: TokenType,
-    leftType: VariableType,
-    rightType: VariableType,
+    leftType: TypeSymbol,
+    rightType: TypeSymbol,
   ): BoundBinaryOperator | null {
     for (let i = 0; i < this.operators.length; i++) {
       const op = this.operators[i];
@@ -59,118 +59,118 @@ export class BoundBinaryOperator {
     new BoundBinaryOperator(
       TokenType.Plus,
       BoundBinaryOperatorKind.Addition,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
     ),
     new BoundBinaryOperator(
       TokenType.Minus,
       BoundBinaryOperatorKind.Subtraction,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
     ),
     new BoundBinaryOperator(
       TokenType.Star,
       BoundBinaryOperatorKind.Multiplication,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
     ),
     new BoundBinaryOperator(
       TokenType.Slash,
       BoundBinaryOperatorKind.Division,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
     ),
 
     new BoundBinaryOperator(
       TokenType.EqualEqual,
       BoundBinaryOperatorKind.Equals,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Boolean,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.BangEqal,
       BoundBinaryOperatorKind.NotEquals,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Boolean,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Boolean,
     ),
 
     new BoundBinaryOperator(
       TokenType.Less,
       BoundBinaryOperatorKind.LessThan,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Boolean,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.LessEqal,
       BoundBinaryOperatorKind.LessThanOrEqualsTo,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Boolean,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.Greater,
       BoundBinaryOperatorKind.GreaterThan,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Boolean,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.GreaterEqal,
       BoundBinaryOperatorKind.GreaterThanOrEqualsTo,
-      VariableType.Number,
-      VariableType.Number,
-      VariableType.Boolean,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Boolean,
     ),
 
     new BoundBinaryOperator(
       TokenType.AndAnd,
       BoundBinaryOperatorKind.LogicalAnd,
-      VariableType.Boolean,
-      VariableType.Boolean,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.PipePipe,
       BoundBinaryOperatorKind.LogicalOr,
-      VariableType.Boolean,
-      VariableType.Boolean,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.EqualEqual,
       BoundBinaryOperatorKind.Equals,
-      VariableType.Boolean,
-      VariableType.Boolean,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
     ),
     new BoundBinaryOperator(
       TokenType.BangEqal,
       BoundBinaryOperatorKind.NotEquals,
-      VariableType.Boolean,
-      VariableType.Boolean,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
     ),
 
     new BoundBinaryOperator(
       TokenType.Plus,
       BoundBinaryOperatorKind.Concatination,
-      VariableType.String,
-      VariableType.String,
-      VariableType.String,
+      TypeSymbol.String,
+      TypeSymbol.String,
+      TypeSymbol.String,
     ),
     new BoundBinaryOperator(
       TokenType.EqualEqual,
       BoundBinaryOperatorKind.Equals,
-      VariableType.String,
-      VariableType.String,
-      VariableType.Boolean,
+      TypeSymbol.String,
+      TypeSymbol.String,
+      TypeSymbol.Boolean,
     ),
   ];
 }
@@ -184,14 +184,14 @@ export enum BoundUnaryOperatorKind {
 export class BoundUnaryOperator {
   readonly operatorTokenType: TokenType;
   readonly kind: BoundUnaryOperatorKind;
-  readonly operandType: VariableType;
-  readonly resultType: VariableType;
+  readonly operandType: TypeSymbol;
+  readonly resultType: TypeSymbol;
 
   private constructor(
     operatorTokenType: TokenType,
     kind: BoundUnaryOperatorKind,
-    operandType: VariableType,
-    resultType: VariableType,
+    operandType: TypeSymbol,
+    resultType: TypeSymbol,
   ) {
     this.operatorTokenType = operatorTokenType;
     this.kind = kind;
@@ -201,7 +201,7 @@ export class BoundUnaryOperator {
 
   static tryBind(
     operatorTokenType: TokenType,
-    operandType: VariableType,
+    operandType: TypeSymbol,
   ): BoundUnaryOperator | null {
     for (let i = 0; i < this.operators.length; i++) {
       const op = this.operators[i];
@@ -218,20 +218,20 @@ export class BoundUnaryOperator {
     new BoundUnaryOperator(
       TokenType.Plus,
       BoundUnaryOperatorKind.Identity,
-      VariableType.Number,
-      VariableType.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
     ),
     new BoundUnaryOperator(
       TokenType.Minus,
       BoundUnaryOperatorKind.Negation,
-      VariableType.Number,
-      VariableType.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
     ),
     new BoundUnaryOperator(
       TokenType.Bang,
       BoundUnaryOperatorKind.LogicalNegation,
-      VariableType.Boolean,
-      VariableType.Boolean,
+      TypeSymbol.Boolean,
+      TypeSymbol.Boolean,
     ),
   ];
 }

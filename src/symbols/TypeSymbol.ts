@@ -1,12 +1,6 @@
 import { TokenType } from '../lexer/token';
 import { Symbol } from './Symbol';
 
-export enum VariableType {
-  Number,
-  String,
-  Boolean,
-}
-
 export class TypeSymbol extends Symbol {
   static readonly Number = new TypeSymbol('number');
   static readonly String = new TypeSymbol('string');
@@ -17,14 +11,14 @@ export class TypeSymbol extends Symbol {
   }
 }
 
-export function variableTypeFromTokenType(type: TokenType): VariableType {
+export function typeSymbolFromTokenType(type: TokenType): TypeSymbol {
   switch (type) {
     case TokenType.NumberKeyword:
-      return VariableType.Number;
+      return TypeSymbol.Number;
     case TokenType.StringKeyword:
-      return VariableType.String;
+      return TypeSymbol.String;
     case TokenType.BooleanKeyword:
-      return VariableType.Boolean;
+      return TypeSymbol.Boolean;
   }
   throw new Error(`Unkown token type ${TokenType[type]}`);
 }
