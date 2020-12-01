@@ -21,7 +21,7 @@ import {
   Expression,
   ExpressionStatement,
 } from '../parser/Nodes';
-import { VariableSymbol } from '../symbols/Variable';
+import { VariableSymbol } from '../symbols/VariableSymbol';
 
 export class Evaluator {
   private lastValue: any;

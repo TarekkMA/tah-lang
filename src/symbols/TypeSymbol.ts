@@ -1,9 +1,20 @@
 import { TokenType } from '../lexer/token';
+import { Symbol } from './Symbol';
 
 export enum VariableType {
   Number,
   String,
   Boolean,
+}
+
+export class TypeSymbol extends Symbol {
+  static readonly Number = new TypeSymbol('number');
+  static readonly String = new TypeSymbol('string');
+  static readonly Boolean = new TypeSymbol('boolean');
+
+  private constructor(name: string) {
+    super(name);
+  }
 }
 
 export function variableTypeFromTokenType(type: TokenType): VariableType {
@@ -16,16 +27,4 @@ export function variableTypeFromTokenType(type: TokenType): VariableType {
       return VariableType.Boolean;
   }
   throw new Error(`Unkown token type ${TokenType[type]}`);
-}
-
-export class VariableSymbol {
-  readonly isReadOnly: boolean;
-  readonly name: string;
-  readonly type: VariableType;
-
-  constructor(isReadOnly: boolean, name: string, type: VariableType) {
-    this.isReadOnly = isReadOnly;
-    this.name = name;
-    this.type = type;
-  }
 }

@@ -21,9 +21,11 @@ import {
 } from '../parser/Nodes';
 import {
   VariableSymbol,
+} from '../symbols/VariableSymbol';
+import {
   VariableType,
-  variableTypeFromTokenType,
-} from '../symbols/Variable';
+  variableTypeFromTokenType
+} from "../symbols/TypeSymbol";
 import {
   BoundAssignmentExpression,
   BoundBinaryExpression,
