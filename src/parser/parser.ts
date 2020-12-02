@@ -1,3 +1,4 @@
+import { throws } from 'assert';
 import { Diagnostic } from '../Diagnostic';
 import Lexer from '../lexer/lexer';
 import { Token, TokenType } from '../lexer/token';
@@ -8,6 +9,7 @@ import {
   BinaryExpression,
   BlockStatement,
   BooleanLiteralExpression,
+  CallExpression,
   ElseClause,
   Expression,
   ExpressionStatement,
@@ -18,12 +20,14 @@ import {
   ParenthesizedExpression,
   Statement,
   StringLiteralExpression,
+  SyntaxNode,
   UnaryExpression,
   VariableDeclarationAsTypePart,
   VariableDeclarationInitalizerPart,
   VariableDeclarationStatement,
   WhileStatement,
 } from './Nodes';
+import { SeparatedSyntaxNodeList } from './SeparatedSyntaxNodeList';
 
 export default class Parser {
   private tokens: Token[];
@@ -272,16 +276,42 @@ export default class Parser {
       }
       case TokenType.Identifier:
       default: {
+        if (
+          this.current.type == TokenType.Identifier &&
+          this.peek(1).type == TokenType.OpenParenthesis
+        ) {
+          return this.parseCallExpression();
+        }
         const token = this.matchToken(TokenType.Identifier);
         return new NameExpression(token);
-        // this.diagnostics.push(
-        //   new Diagnostic(
-        //     this.current.textSpan,
-        //     `Unexpected token <${TokenFacts.getTypeName(this.current.type)}>.`,
-        //   ),
-        // );
-        // return new ExpressionStub();
       }
     }
+  }
+
+  private parseCallExpression(): CallExpression {
+    const identifier = this.matchToken(TokenType.Identifier);
+    const openPren = this.matchToken(TokenType.OpenParenthesis);
+    const prams = this.parseParams();
+    const closePren = this.matchToken(TokenType.CloseParenthesis);
+    return new CallExpression(identifier, openPren, prams, closePren);
+  }
+
+  private parseParams(): SeparatedSyntaxNodeList<Expression> {
+    const pramsAndSeps: SyntaxNode[] = [];
+
+    while (
+      this.current.type != TokenType.CloseParenthesis &&
+      this.current.type != TokenType.EndOfFile
+    ) {
+      const expression = this.parseExpression();
+      pramsAndSeps.push(expression);
+
+      if (this.peek(0).type != TokenType.CloseParenthesis) {
+        const comma = this.matchToken(TokenType.Comma);
+        pramsAndSeps.push(comma);
+      }
+    }
+
+    return new SeparatedSyntaxNodeList(pramsAndSeps);
   }
 }

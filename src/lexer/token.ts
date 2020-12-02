@@ -49,6 +49,7 @@ export enum TokenType {
   IfKeyword,
   WhileKeyword,
   ElseKeyword,
+  Comma,
 }
 
 export class Token implements AstNode {

@@ -30,4 +30,8 @@ export class BuiltinFunctions {
     [new ParameterSymbol('max', TypeSymbol.Number)],
     TypeSymbol.Number,
   );
+
+  static getAll(): readonly FunctionSymbol[] {
+    return [this.print, this.input, this.rnd];
+  }
 }

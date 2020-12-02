@@ -6,6 +6,7 @@ import {
   BinaryExpression,
   BlockStatement,
   BooleanLiteralExpression,
+  CallExpression,
   Expression,
   ExpressionStatement,
   IfStatement,
@@ -26,6 +27,7 @@ import {
   BoundBinaryExpression,
   BoundBlockStatement,
   BoundBooleanLiteral,
+  BoundCallExpression,
   BoundExpression,
   BoundExpressionStatement,
   BoundIfStatement,
@@ -40,6 +42,7 @@ import {
 } from './BoundNodes';
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
 import { BoundGlobalScope, BoundScope } from './Scopes';
+import { BuiltinFunctions } from '../symbols/FunctionSymbol';
 
 export class Binder {
   public diagnostics: Diagnostic[] = [];
@@ -217,10 +220,61 @@ export class Binder {
       return this.bindUnaryExpression(expression);
     } else if (expression instanceof BinaryExpression) {
       return this.bindBinaryExpression(expression);
+    } else if (expression instanceof CallExpression) {
+      return this.bindCallExpression(expression);
     }
     throw new Error(
       `Unexpected expression type ${expression.constructor.name}`,
     );
+  }
+
+  private bindCallExpression(expression: CallExpression): BoundCallExpression {
+    const builtinFuns = BuiltinFunctions.getAll();
+
+    const search = builtinFuns.filter(
+      (f) => f.name == expression.identifier.text,
+    );
+
+    const isBuiltin = search.length > 0;
+
+    if (!isBuiltin) {
+      this.diagnostics.push(
+        new Diagnostic(
+          expression.identifier.textSpan,
+          `Function ${expression.identifier.text} doesn't exist.`,
+        ),
+      );
+    }
+
+    const f = search[0];
+
+    if (expression.parameters.length != f.parameters.length) {
+      this.diagnostics.push(
+        new Diagnostic(
+          expression.textSpan,
+          `Function ${f.name} was expecting ${f.parameters.length} args but got ${expression.parameters.length} insted.`,
+        ),
+      );
+    }
+    const boundParams: BoundExpression[] = [];
+
+    for (let i = 0; i < expression.parameters.length; i++) {
+      const node = expression.parameters.nodeAt(i);
+      const param = f.parameters[i];
+      const boundExpr = this.bindExpression(node);
+      boundParams.push(boundExpr);
+
+      if (boundExpr.type != param.type) {
+        this.diagnostics.push(
+          new Diagnostic(
+            node.textSpan,
+            `Parameter ${param.name} was expecting type ${param.type.name} but got ${boundExpr.type.name} insted.`,
+          ),
+        );
+      }
+    }
+
+    return new BoundCallExpression(f, boundParams);
   }
 
   private bindParenthesizedExpression(

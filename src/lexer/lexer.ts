@@ -28,6 +28,8 @@ export const lexerPatterns: LexerPattern[] = [
   new LexerPattern(/^true\b/, TokenType.True),
   new LexerPattern(/^false\b/, TokenType.False),
 
+  new LexerPattern(/^,/, TokenType.Comma),
+
   new LexerPattern(/^\<\=/, TokenType.LessEqal),
   new LexerPattern(/^\>\=/, TokenType.GreaterEqal),
   new LexerPattern(/^\</, TokenType.Less),

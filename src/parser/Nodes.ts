@@ -1,6 +1,7 @@
 import { Token } from '../lexer/token';
 import { TextSpan } from '../TextSpan';
 import { AstNode } from '../visualization/ast';
+import { SeparatedSyntaxNodeList } from './SeparatedSyntaxNodeList';
 
 export abstract class SyntaxNode implements AstNode {
   public abstract readonly textSpan: TextSpan;
@@ -158,6 +159,34 @@ export class NameExpression extends Expression {
 
   public get children(): AstNode[] | undefined {
     return [this.identifier];
+  }
+}
+
+export class CallExpression extends Expression {
+  readonly name = 'CallExpression';
+  constructor(
+    readonly identifier: Token,
+    readonly openParenthesis: Token,
+    readonly parameters: SeparatedSyntaxNodeList<Expression>,
+    readonly closeParenthesis: Token,
+  ) {
+    super();
+  }
+
+  public get textSpan(): TextSpan {
+    return TextSpan.fromStartEnd(
+      this.identifier.textSpan.start,
+      this.closeParenthesis.textSpan.end,
+    );
+  }
+
+  public get children(): AstNode[] | undefined {
+    return [
+      this.identifier,
+      this.openParenthesis,
+      ...this.parameters.separatorsAndNodes,
+      this.closeParenthesis,
+    ];
   }
 }
 

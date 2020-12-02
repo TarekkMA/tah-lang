@@ -14,6 +14,7 @@ import { whileExample } from './code-examples';
 import { defineTahMode, tahModeName } from './tah-mode';
 
 import Split from 'split.js';
+import { EvaluatorConsole } from '../src/evaluator/EvaluatorConsole';
 
 $('#ast')
   .on('hover_node.jstree', (_, node) => {
@@ -69,14 +70,21 @@ editor.on('change', () => {
   }
 });
 
+const evalConsole: EvaluatorConsole = {
+  print: function (message) {
+    console.log(message);
+    output.value += message;
+  },
+};
+
 runButton.onclick = function () {
   const codeString = editor.getValue();
   const variables = new Map();
   const syntaxTree = SyntaxTree.parse(codeString);
   showAst(syntaxTree);
   const compilation = new Compilation(syntaxTree);
-  const result = compilation.evaluate(variables);
   output.value = 'Output:\n\n';
+  const result = compilation.evaluate(evalConsole, variables);
   if (result.diagnostics.length > 0) {
     output.value += result.diagnostics.join('\n');
     result.diagnostics.forEach((d) => {

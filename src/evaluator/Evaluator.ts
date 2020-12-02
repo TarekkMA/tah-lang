@@ -2,6 +2,7 @@ import {
   BoundAssignmentExpression,
   BoundBinaryExpression,
   BoundBlockStatement,
+  BoundCallExpression,
   BoundExpression,
   BoundExpressionStatement,
   BoundIfStatement,
@@ -16,7 +17,10 @@ import {
   BoundBinaryOperatorKind,
   BoundUnaryOperatorKind,
 } from '../binder/BoundOprators';
+import { CallExpression } from '../parser/Nodes';
+import { BuiltinFunctions } from '../symbols/FunctionSymbol';
 import { VariableSymbol } from '../symbols/VariableSymbol';
+import { EvaluatorConsole } from './EvaluatorConsole';
 
 export class Evaluator {
   private lastValue: any;
@@ -24,6 +28,7 @@ export class Evaluator {
   constructor(
     readonly root: BoundStatement,
     readonly variables: Map<VariableSymbol, any>,
+    readonly evalConsole: EvaluatorConsole,
   ) {}
 
   evaluate(): any {
@@ -90,8 +95,16 @@ export class Evaluator {
       return this.evaluateBoundUnaryExpression(expression);
     } else if (expression instanceof BoundBinaryExpression) {
       return this.evaluateBoundBinaryExpression(expression);
+    } else if (expression instanceof BoundCallExpression) {
+      return this.evaluateCallExpression(expression);
     } else {
       throw new Error(`Unexpexted expression ${expression.constructor.name}`);
+    }
+  }
+  evaluateCallExpression(expression: BoundCallExpression): any {
+    if (expression.func == BuiltinFunctions.print) {
+      const message = this.evaluateExpression(expression.parameters[0]);
+      this.evalConsole.print(message);
     }
   }
   evaluateBoundLiteralExpression(literal: BoundLiteralExpression<any>): any {

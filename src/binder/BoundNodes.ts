@@ -1,6 +1,7 @@
 import { VariableSymbol } from '../symbols/VariableSymbol';
 import { TypeSymbol } from '../symbols/TypeSymbol';
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
+import { FunctionSymbol } from '../symbols/FunctionSymbol';
 
 export abstract class BoundNode {}
 
@@ -67,6 +68,18 @@ export class BoundUnaryExpression extends BoundExpression {
   constructor(
     readonly oprator: BoundUnaryOperator,
     readonly operand: BoundExpression,
+  ) {
+    super();
+  }
+}
+
+export class BoundCallExpression extends BoundExpression {
+  public get type(): TypeSymbol {
+    return this.func.returnType;
+  }
+  constructor(
+    readonly func: FunctionSymbol,
+    readonly parameters: readonly BoundExpression[],
   ) {
     super();
   }
