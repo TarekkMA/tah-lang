@@ -86,8 +86,9 @@ runButton.onclick = function () {
   output.value = 'Output:\n\n';
   const result = compilation.evaluate(evalConsole, variables);
   if (result.diagnostics.length > 0) {
-    output.value += result.diagnostics.join('\n');
-    result.diagnostics.forEach((d) => {
+    const reports = result.diagnostics.reports;
+    output.value += reports.map((r) => r.message).join('\n');
+    reports.forEach((d) => {
       const { from, to } = textSpanToStartLEndL(d.span, codeString);
       const mark = editor.markText(from, to, { className: 'cm-red_wavy_line' });
       errorMarks.push(mark);

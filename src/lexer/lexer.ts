@@ -1,4 +1,4 @@
-import { Diagnostic } from '../Diagnostic';
+import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
 import { Token, TokenType } from './token';
 
 class LexerPattern {
@@ -57,7 +57,7 @@ export const lexerPatterns: LexerPattern[] = [
 export default class Lexer {
   private readonly codeString: string;
   private position = 0;
-  public diagnostics: Diagnostic[] = [];
+  public diagnostics = new Diagnostics();
 
   constructor(codeString: string) {
     this.codeString = codeString;
@@ -88,9 +88,7 @@ export default class Lexer {
     const badChar = this.current();
     const badPosition = this.position;
     const badToken = new Token(badPosition, TokenType.BadChar, badChar);
-    this.diagnostics.push(
-      new Diagnostic(badToken.textSpan, `Bad character input: ${badChar}`),
-    );
+    this.diagnostics.reportBadCharacter(badToken);
     this.position++;
     return badToken;
   }

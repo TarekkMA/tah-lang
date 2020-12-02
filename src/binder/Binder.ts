@@ -1,4 +1,4 @@
-import { Diagnostic } from '../Diagnostic';
+import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
 import { TokenType } from '../lexer/token';
 import { CompilationUnit } from '../parser/CompilationUnit';
 import {
@@ -45,7 +45,7 @@ import { BoundGlobalScope, BoundScope } from './Scopes';
 import { BuiltinFunctions } from '../symbols/FunctionSymbol';
 
 export class Binder {
-  public diagnostics: Diagnostic[] = [];
+  public diagnostics = new Diagnostics();
   private scope: BoundScope;
 
   constructor(parentScope?: BoundScope) {
@@ -60,9 +60,11 @@ export class Binder {
     const binder = new Binder(scope);
     const statment = binder.bindStatement(compilationUnit.statement);
     const variables = binder.scope?.getDeclaredVariables() || [];
-    const diagnostics = (previous?.diagnostics || []).concat(
-      binder.diagnostics,
-    );
+    const diagnostics = new Diagnostics();
+    if (previous?.diagnostics) {
+      diagnostics.addDiagnostics(diagnostics);
+    }
+    diagnostics.addDiagnostics(binder.diagnostics);
 
     return new BoundGlobalScope(diagnostics, variables, statment, previous);
   }
@@ -137,11 +139,10 @@ export class Binder {
       );
 
       if (initializer != undefined && initializer.type != typeFromToken) {
-        this.diagnostics.push(
-          new Diagnostic(
-            statement.initializerPart!.equalsToken.textSpan,
-            `${initializer.type.name} cannot be assigned to a variable of type ${typeFromToken.name}`,
-          ),
+        this.diagnostics.reportCannotConvert(
+          statement.initializerPart!.equalsToken.textSpan,
+          initializer.type,
+          typeFromToken,
         );
       }
 
@@ -153,12 +154,7 @@ export class Binder {
     const variable = new VariableSymbol(isReadOnly, name, type!);
 
     if (!this.scope?.tryDeclare(variable)) {
-      this.diagnostics.push(
-        new Diagnostic(
-          statement.identifier.textSpan,
-          `Variable with the name ${name} already declared`,
-        ),
-      );
+      this.diagnostics.reportVariableAlreadyDeclared(statement.identifier);
     }
 
     return new BoundVariableDeclarationStatement(variable, initializer);
@@ -197,11 +193,10 @@ export class Binder {
   ): BoundExpression {
     const boundExpression = this.bindExpression(expression);
     if (boundExpression.type != expectedType) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.textSpan,
-          `expected the expression to evaluate to ${expectedType.name} but it did evaluate to ${boundExpression.type.name}.`,
-        ),
+      this.diagnostics.reportCannotConvert(
+        expression.textSpan,
+        boundExpression.type,
+        expectedType,
       );
     }
     return boundExpression;
@@ -228,48 +223,45 @@ export class Binder {
     );
   }
 
-  private bindCallExpression(expression: CallExpression): BoundCallExpression {
+  private bindCallExpression(
+    callExpression: CallExpression,
+  ): BoundCallExpression {
     const builtinFuns = BuiltinFunctions.getAll();
 
     const search = builtinFuns.filter(
-      (f) => f.name == expression.identifier.text,
+      (f) => f.name == callExpression.identifier.text,
     );
 
     const isBuiltin = search.length > 0;
 
     if (!isBuiltin) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.identifier.textSpan,
-          `Function ${expression.identifier.text} doesn't exist.`,
-        ),
-      );
+      this.diagnostics.reportUndefinedFunction(callExpression.identifier);
     }
 
     const f = search[0];
 
-    if (expression.parameters.length != f.parameters.length) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.textSpan,
-          `Function ${f.name} was expecting ${f.parameters.length} args but got ${expression.parameters.length} insted.`,
-        ),
+    if (callExpression.parameters.length != f.parameters.length) {
+      this.diagnostics.reportWrongArgumentsCount(
+        callExpression.textSpan,
+        callExpression.identifier.text!,
+        f.parameters.length,
+        callExpression.parameters.length,
       );
     }
     const boundParams: BoundExpression[] = [];
 
-    for (let i = 0; i < expression.parameters.length; i++) {
-      const node = expression.parameters.nodeAt(i);
+    for (let i = 0; i < callExpression.parameters.length; i++) {
+      const node = callExpression.parameters.nodeAt(i);
       const param = f.parameters[i];
       const boundExpr = this.bindExpression(node);
       boundParams.push(boundExpr);
 
       if (boundExpr.type != param.type) {
-        this.diagnostics.push(
-          new Diagnostic(
-            node.textSpan,
-            `Parameter ${param.name} was expecting type ${param.type.name} but got ${boundExpr.type.name} insted.`,
-          ),
+        this.diagnostics.reportWrongArgumentType(
+          node.textSpan,
+          param.name,
+          param.type,
+          boundExpr.type,
         );
       }
     }
@@ -303,12 +295,7 @@ export class Binder {
 
     let variable: VariableSymbol | null = null;
     if ((variable = this.scope?.tryLookup(name) ?? null) == null) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.identifier.textSpan,
-          `Cannot find a variable with the name ${name}.`,
-        ),
-      );
+      this.diagnostics.reportUndefinedName(expression.identifier);
       return new BoundNumberLiteralExpression(0);
     }
 
@@ -323,30 +310,22 @@ export class Binder {
 
     let variable: VariableSymbol | null = null;
     if ((variable = this.scope?.tryLookup(name) ?? null) == null) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.identifier.textSpan,
-          `Cannot find a variable with the name ${name}.`,
-        ),
-      );
+      this.diagnostics.reportUndefinedName(expression.identifier);
       return boundExpression;
     }
 
     if (variable.isReadOnly) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.identifier.textSpan,
-          `${name} is a read only variable.`,
-        ),
+      this.diagnostics.reportCannotAssignReadonly(
+        expression.textSpan,
+        variable.name,
       );
     }
 
     if (boundExpression.type != variable.type) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.identifier.textSpan,
-          `${boundExpression.type.name} cannot be assigned to a variable of type ${variable.type.name}`,
-        ),
+      this.diagnostics.reportCannotConvert(
+        expression.textSpan,
+        boundExpression.type,
+        variable.type,
       );
       return boundExpression;
     }
@@ -362,11 +341,10 @@ export class Binder {
     );
 
     if (boundOperator == null) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.operator.textSpan,
-          `Unary operator '${expression.operator.text}' is not defined for type ${boundOperand.type.name}.`,
-        ),
+      this.diagnostics.reportUndefinedUnaryOperator(
+        expression.operator.textSpan,
+        expression.operator.text!,
+        boundOperand.type,
       );
       return boundOperand;
     }
@@ -385,11 +363,11 @@ export class Binder {
     );
 
     if (boundOperator == null) {
-      this.diagnostics.push(
-        new Diagnostic(
-          expression.oprator.textSpan,
-          `Binary operator '${expression.oprator.text}' is not defined for types ${boundLeft.type.name} and ${boundRight.type.name}.`,
-        ),
+      this.diagnostics.reportUndefinedBinaryOperator(
+        expression.oprator.textSpan,
+        expression.oprator.text!,
+        boundLeft.type,
+        boundRight.type,
       );
       return boundLeft;
     }

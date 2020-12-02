@@ -1,5 +1,5 @@
 import { throws } from 'assert';
-import { Diagnostic } from '../Diagnostic';
+import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
 import Lexer from '../lexer/lexer';
 import { Token, TokenType } from '../lexer/token';
 import { TokenFacts } from '../lexer/TokenFacts';
@@ -32,7 +32,7 @@ import { SeparatedSyntaxNodeList } from './SeparatedSyntaxNodeList';
 export default class Parser {
   private tokens: Token[];
   private position = 0;
-  public diagnostics: Diagnostic[] = [];
+  public diagnostics = new Diagnostics();
 
   constructor(codeString: string) {
     const tokens: Token[] = [];
@@ -50,7 +50,7 @@ export default class Parser {
       }
     } while (token.type != TokenType.EndOfFile);
     this.tokens = tokens;
-    this.diagnostics.push(...lexer.diagnostics);
+    this.diagnostics.addDiagnostics(lexer.diagnostics);
   }
 
   private peek(offset: number): Token {
@@ -71,15 +71,10 @@ export default class Parser {
 
   private matchToken(...types: TokenType[]): Token {
     if (types.includes(this.current.type)) return this.nextToken();
-    this.diagnostics.push(
-      new Diagnostic(
-        this.current.textSpan,
-        `Unexpected token <${TokenFacts.getTypeName(
-          this.current.type,
-        )}>, expected ${types
-          .map((t) => '<' + TokenFacts.getTypeName(t) + '>')
-          .join(' or ')}.`,
-      ),
+    this.diagnostics.reportUnexpectedToken(
+      this.current.textSpan,
+      this.current.type,
+      ...types,
     );
     return new Token(this.current.position, types[0]);
   }
@@ -149,19 +144,15 @@ export default class Parser {
       );
     }
     if (isReadonly && initializerPart == undefined) {
-      this.diagnostics.push(
-        new Diagnostic(
-          identifier.textSpan,
-          `"${identifier.text}" must have an initializer`,
-        ),
+      this.diagnostics.reportMustHaveAnInitializerOrType(
+        identifier.textSpan,
+        identifier.text!,
       );
     }
     if (initializerPart == undefined && asTypePart == undefined) {
-      this.diagnostics.push(
-        new Diagnostic(
-          identifier.textSpan,
-          `"${identifier.text}" must have a type or an initializer`,
-        ),
+      this.diagnostics.reportMustHaveAnInitializerOrType(
+        identifier.textSpan,
+        identifier.text!,
       );
     }
     return new VariableDeclarationStatement(

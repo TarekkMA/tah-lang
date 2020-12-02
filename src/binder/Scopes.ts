@@ -1,10 +1,10 @@
-import { Diagnostic } from '../Diagnostic';
+import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
 import { VariableSymbol } from '../symbols/VariableSymbol';
 import { BoundStatement } from './BoundNodes';
 
 export class BoundGlobalScope {
   constructor(
-    readonly diagnostics: Diagnostic[],
+    readonly diagnostics: Diagnostics,
     readonly variables: readonly VariableSymbol[],
     readonly statement: BoundStatement,
     readonly previous?: BoundGlobalScope,

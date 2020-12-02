@@ -1,4 +1,4 @@
-import { Diagnostic } from '../Diagnostic';
+import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
 import { TextSpan } from '../TextSpan';
 import { AstNode } from '../visualization/ast';
 import { CompilationUnit } from './CompilationUnit';
@@ -7,10 +7,10 @@ import Parser from './parser';
 
 export default class SyntaxTree implements SyntaxNode {
   readonly name = 'SyntaxTree';
-  readonly diagnostics: Diagnostic[];
+  readonly diagnostics: Diagnostics;
   readonly root: CompilationUnit;
 
-  constructor(root: CompilationUnit, diagnostics: Diagnostic[]) {
+  constructor(root: CompilationUnit, diagnostics: Diagnostics) {
     this.root = root;
     this.diagnostics = diagnostics;
   }

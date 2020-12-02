@@ -1,16 +1,13 @@
 import { Binder } from './binder/Binder';
 import { BoundGlobalScope } from './binder/Scopes';
-import { Diagnostic } from './Diagnostic';
+import { Diagnostic, Diagnostics } from './diagnostics/Diagnostic';
 import { Evaluator } from './evaluator/Evaluator';
 import { EvaluatorConsole } from './evaluator/EvaluatorConsole';
 import SyntaxTree from './parser/SyntaxTree';
 import { VariableSymbol } from './symbols/VariableSymbol';
 
 export class EvaluationResult {
-  constructor(
-    readonly diagnostics: readonly Diagnostic[],
-    readonly value: any,
-  ) {}
+  constructor(readonly diagnostics: Diagnostics, readonly value: any) {}
 }
 
 export class Compilation {
@@ -38,9 +35,8 @@ export class Compilation {
     evalConsole: EvaluatorConsole,
     variables: Map<VariableSymbol, any>,
   ): EvaluationResult {
-    const diagnostics = this.syntaxTree.diagnostics.concat(
-      this.globalScope.diagnostics,
-    );
+    const diagnostics = this.syntaxTree.diagnostics;
+    diagnostics.addDiagnostics(this.globalScope.diagnostics);
     if (diagnostics.length) {
       return new EvaluationResult(diagnostics, null);
     }
@@ -51,6 +47,6 @@ export class Compilation {
       evalConsole,
     );
     const value = evaluator.evaluate();
-    return new EvaluationResult([], value);
+    return new EvaluationResult(new Diagnostics(), value);
   }
 }
