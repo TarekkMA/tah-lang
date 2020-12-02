@@ -234,17 +234,24 @@ export class Binder {
   }
 
   private bindCallExpression(callExpression: CallExpression): BoundExpression {
-    let func: FunctionSymbol | null = null;
+    let v: VariableSymbol | null = null;
     if (
-      (func =
-        this.scope?.tryLookupAs<FunctionSymbol>(
-          callExpression.identifier.text!,
-          TypeSymbol.Function,
-        ) ?? null) == null
+      (v = this.scope?.tryLookup(callExpression.identifier.text!) ?? null) ==
+      null
     ) {
       this.diagnostics.reportUndefinedName(callExpression.identifier);
       return new BoundErrorExpression();
     }
+
+    if (v instanceof FunctionSymbol == false) {
+      this.diagnostics.reportCannotCallName(
+        callExpression.textSpan,
+        v.name,
+        v.type,
+      );
+      return new BoundErrorExpression();
+    }
+    const func = v as FunctionSymbol;
 
     if (callExpression.parameters.length != func.parameters.length) {
       this.diagnostics.reportWrongArgumentsCount(

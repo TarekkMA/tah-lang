@@ -137,4 +137,11 @@ export class Diagnostics {
       `Binary operator '${operatorText}' is not defined for types '${leftType}' and '${rightType}'.`,
     );
   }
+
+  reportCannotCallName(span: TextSpan, name: string, type: TypeSymbol): void {
+    this.report(
+      span,
+      `Symbol '${name}' of type '${type.name}' cannot be called.`,
+    );
+  }
 }
