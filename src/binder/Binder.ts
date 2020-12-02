@@ -44,7 +44,7 @@ import {
 } from './BoundNodes';
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
 import { BoundGlobalScope, BoundScope } from './Scopes';
-import { BuiltinFunctions } from '../symbols/FunctionSymbol';
+import { BuiltinFunctions, FunctionSymbol } from '../symbols/FunctionSymbol';
 
 export class Binder {
   public diagnostics = new Diagnostics();
@@ -71,16 +71,14 @@ export class Binder {
     return new BoundGlobalScope(diagnostics, variables, statment, previous);
   }
 
-  static createParentScope(
-    previous?: BoundGlobalScope,
-  ): BoundScope | undefined {
+  static createParentScope(previous?: BoundGlobalScope): BoundScope {
     const stack: BoundGlobalScope[] = [];
     while (previous != undefined) {
       stack.push(previous);
       previous = previous.previous;
     }
 
-    let parent: BoundScope | undefined = undefined;
+    let parent: BoundScope = this.createRootScopee();
 
     while (stack.length > 0) {
       previous = stack.pop();
@@ -92,6 +90,14 @@ export class Binder {
     }
 
     return parent;
+  }
+
+  private static createRootScopee(): BoundScope {
+    const scope = new BoundScope();
+    BuiltinFunctions.getAll().forEach((f) => {
+      scope.tryDeclare(f);
+    });
+    return scope;
   }
 
   private bindStatement(statement: Statement): BoundStatement {
@@ -228,26 +234,23 @@ export class Binder {
   }
 
   private bindCallExpression(callExpression: CallExpression): BoundExpression {
-    const builtinFuns = BuiltinFunctions.getAll();
-
-    const search = builtinFuns.filter(
-      (f) => f.name == callExpression.identifier.text,
-    );
-
-    const isBuiltin = search.length > 0;
-
-    if (!isBuiltin) {
-      this.diagnostics.reportUndefinedFunction(callExpression.identifier);
+    let func: FunctionSymbol | null = null;
+    if (
+      (func =
+        this.scope?.tryLookupAs<FunctionSymbol>(
+          callExpression.identifier.text!,
+          TypeSymbol.Function,
+        ) ?? null) == null
+    ) {
+      this.diagnostics.reportUndefinedName(callExpression.identifier);
       return new BoundErrorExpression();
     }
 
-    const f = search[0];
-
-    if (callExpression.parameters.length != f.parameters.length) {
+    if (callExpression.parameters.length != func.parameters.length) {
       this.diagnostics.reportWrongArgumentsCount(
         callExpression.textSpan,
         callExpression.identifier.text!,
-        f.parameters.length,
+        func.parameters.length,
         callExpression.parameters.length,
       );
       return new BoundErrorExpression();
@@ -256,7 +259,7 @@ export class Binder {
 
     for (let i = 0; i < callExpression.parameters.length; i++) {
       const node = callExpression.parameters.nodeAt(i);
-      const param = f.parameters[i];
+      const param = func.parameters[i];
       const boundExpr = this.bindExpression(node);
       boundParams.push(boundExpr);
 
@@ -271,7 +274,7 @@ export class Binder {
       }
     }
 
-    return new BoundCallExpression(f, boundParams);
+    return new BoundCallExpression(func, boundParams);
   }
 
   private bindParenthesizedExpression(
@@ -316,7 +319,7 @@ export class Binder {
     let variable: VariableSymbol | null = null;
     if ((variable = this.scope?.tryLookup(name) ?? null) == null) {
       this.diagnostics.reportUndefinedName(expression.identifier);
-      return boundExpression;
+      return new BoundErrorExpression();
     }
 
     if (variable.isReadOnly) {

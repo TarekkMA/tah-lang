@@ -1,4 +1,5 @@
 import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
+import { TypeSymbol } from '../symbols/TypeSymbol';
 import { VariableSymbol } from '../symbols/VariableSymbol';
 import { BoundStatement } from './BoundNodes';
 
@@ -31,6 +32,16 @@ export class BoundScope {
     }
     if (this.parent == undefined) return null;
     return this.parent.tryLookup(name);
+  }
+
+  tryLookupAs<T extends VariableSymbol>(
+    name: string,
+    typeCheck?: TypeSymbol,
+  ): T | null {
+    const vSymbol = this.tryLookup(name);
+    if (vSymbol == null) return null;
+    if (typeCheck != undefined && vSymbol.type != typeCheck) return null;
+    return vSymbol as T;
   }
 
   getDeclaredVariables(): ReadonlyArray<VariableSymbol> {
