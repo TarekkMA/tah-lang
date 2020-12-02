@@ -18,8 +18,8 @@ Check out the live web app at: https://tarekkma.github.io/tah-lang/
 
 ## TODO
 
-- [ ] function types
-  - [ ] built in (print/println)
+- [x] function types
+  - [x] built in (print/rnd)
   - [ ] function declaration
   - [ ] function call
 - [ ] compile to webassembly
