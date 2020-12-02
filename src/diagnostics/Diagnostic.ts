@@ -63,6 +63,17 @@ export class Diagnostics {
     this.report(span, `Cannot convert type '${from.name}' to '${to.name}'.`);
   }
 
+  reportCannotConvertImplicitly(
+    span: TextSpan,
+    from: TypeSymbol,
+    to: TypeSymbol,
+  ): void {
+    this.report(
+      span,
+      `Cannot convert type '${from.name}' to '${to.name} implicitly'.`,
+    );
+  }
+
   reportUndefinedFunction(functionIdentifier: Token): void {
     this.report(
       functionIdentifier.textSpan,

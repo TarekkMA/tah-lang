@@ -180,7 +180,7 @@ export class Binder {
   }
 
   private bindIfStatement(statement: IfStatement): BoundIfStatement {
-    const boundCondition = this.bindExpressionWithExpectedType(
+    const boundCondition = this.bindConversion(
       statement.condition,
       TypeSymbol.Boolean,
     );
@@ -191,27 +191,12 @@ export class Binder {
     return new BoundIfStatement(boundCondition, boundThen, boundElse);
   }
   private bindWhileStatement(statement: WhileStatement): BoundWhileStatement {
-    const boundCondition = this.bindExpressionWithExpectedType(
+    const boundCondition = this.bindConversion(
       statement.condition,
       TypeSymbol.Boolean,
     );
     const boundBody = this.bindStatement(statement.body);
     return new BoundWhileStatement(boundCondition, boundBody);
-  }
-
-  private bindExpressionWithExpectedType(
-    expression: Expression,
-    expectedType: TypeSymbol,
-  ): BoundExpression {
-    const boundExpression = this.bindExpression(expression);
-    if (boundExpression.type != expectedType) {
-      this.diagnostics.reportCannotConvert(
-        expression.textSpan,
-        boundExpression.type,
-        expectedType,
-      );
-    }
-    return boundExpression;
   }
 
   private bindExpression(expression: Expression): BoundExpression {
@@ -242,17 +227,37 @@ export class Binder {
   private bindConversionExpression(
     convExp: ConversionExpression,
   ): BoundExpression {
-    const boundExp = this.bindExpression(convExp.expression);
     const toType = typeSymbolFromTokenType(convExp.typeToken.type);
+    return this.bindConversion(convExp.expression, toType, true);
+  }
+
+  private bindConversion(
+    expression: Expression,
+    toType: TypeSymbol,
+    explicit = false,
+  ): BoundExpression {
+    const boundExp = this.bindExpression(expression);
     const conversion = Conversion.classify(boundExp.type, toType);
     if (!conversion.exists) {
       this.diagnostics.reportCannotConvert(
-        convExp.textSpan,
+        expression.textSpan,
         boundExp.type,
         toType,
       );
       return new BoundErrorExpression();
     }
+
+    if (conversion.isIdentity) return boundExp;
+
+    if (!conversion.isImplicit && !explicit) {
+      this.diagnostics.reportCannotConvertImplicitly(
+        expression.textSpan,
+        boundExp.type,
+        toType,
+      );
+      return new BoundErrorExpression();
+    }
+
     return new BoundConversionExpression(toType, boundExp);
   }
 
