@@ -109,7 +109,7 @@ export class ParenthesizedExpression extends Expression {
   public get textSpan(): TextSpan {
     return TextSpan.fromStartEnd(
       this.openParenthesisToken.textSpan.start,
-      this.openParenthesisToken.textSpan.end,
+      this.closeParenthesisToken.textSpan.end,
     );
   }
   constructor(
