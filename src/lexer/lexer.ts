@@ -2,12 +2,11 @@ import { Diagnostic, Diagnostics } from '../diagnostics/Diagnostic';
 import { Token, TokenType } from './token';
 
 class LexerPattern {
-  public readonly pattern: RegExp;
-  public readonly tokenType: TokenType;
-  constructor(pattern: RegExp, type: TokenType) {
-    this.pattern = pattern;
-    this.tokenType = type;
-  }
+  constructor(
+    readonly pattern: RegExp,
+    readonly tokenType: TokenType,
+    readonly transformer?: (matched: string) => string,
+  ) {}
 }
 
 export const lexerPatterns: LexerPattern[] = [
@@ -50,7 +49,16 @@ export const lexerPatterns: LexerPattern[] = [
   new LexerPattern(/^\)/, TokenType.CloseParenthesis),
   new LexerPattern(/^\{/, TokenType.OpenBrace),
   new LexerPattern(/^\}/, TokenType.CloseBrace),
-  new LexerPattern(/^((\"[^\"]*\")|(\'[^\']*\'))/, TokenType.String),
+  new LexerPattern(
+    /^((\"(\\.|[^\"])*\")|(\'(\\.|[^\'])*\'))/,
+    TokenType.String,
+    (matched) => {
+      return matched
+        .replace(/\\n/g, '\n')
+        .replace(/\\\"/g, '"')
+        .replace(/\\\'/g, "'");
+    },
+  ),
   new LexerPattern(/^[a-zA-Z_][a-zA-Z_0-9]*/, TokenType.Identifier),
 ];
 
@@ -81,7 +89,10 @@ export default class Lexer {
         const matchedText = matches[0];
         const matchPos = this.position;
         this.position += matchedText.length;
-        return new Token(matchPos, pattern.tokenType, matches[0]);
+        const mathcedText = pattern.transformer
+          ? pattern.transformer(matches[0])
+          : matches[0];
+        return new Token(matchPos, pattern.tokenType, mathcedText);
       }
     }
 

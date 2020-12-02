@@ -24,6 +24,11 @@ export class BuiltinFunctions {
     [new ParameterSymbol('message', TypeSymbol.String)],
     TypeSymbol.Void,
   );
+  static println = new FunctionSymbol(
+    'println',
+    [new ParameterSymbol('message', TypeSymbol.String)],
+    TypeSymbol.Void,
+  );
   static input = new FunctionSymbol('input', [], TypeSymbol.String);
   static rnd = new FunctionSymbol(
     'rnd',
@@ -32,6 +37,6 @@ export class BuiltinFunctions {
   );
 
   static getAll(): readonly FunctionSymbol[] {
-    return [this.print, this.input, this.rnd];
+    return [this.print, this.println, this.input, this.rnd];
   }
 }

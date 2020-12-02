@@ -117,6 +117,9 @@ export class Evaluator {
     if (expression.func == BuiltinFunctions.print) {
       const message = this.evaluateExpression(expression.parameters[0]);
       this.evalConsole.print(message);
+    } else if (expression.func == BuiltinFunctions.println) {
+      const message = this.evaluateExpression(expression.parameters[0]);
+      this.evalConsole.print(message + '\n');
     } else if (expression.func == BuiltinFunctions.rnd) {
       const max = this.evaluateExpression(expression.parameters[0]) as number;
       return Math.random() * max;
