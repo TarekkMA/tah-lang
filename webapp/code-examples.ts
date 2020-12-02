@@ -8,11 +8,21 @@ export const whileExample = `/**
   val a as string = "this is a const string"
   var x as number = 1
 
+
+	var i = 0
+  while(i < 12){
+  	var iStr = string(i)
+    var mulStr = string(i * i)
+  	println(iStr + " * " + iStr + " = " + mulStr)
+  	i = i + 1
+  }
+  println("")
   
   while x < 50
     x = x + 8.1
   
   println(string(x)) /*Result should be 57.7*/
+  
   "hello" + " " + "Tarek"
 }
 `;
