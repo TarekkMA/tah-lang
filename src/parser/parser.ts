@@ -26,6 +26,7 @@ import {
   VariableDeclarationInitalizerPart,
   VariableDeclarationStatement,
   WhileStatement,
+  ConversionExpression,
 } from './Nodes';
 import { SeparatedSyntaxNodeList } from './SeparatedSyntaxNodeList';
 
@@ -238,49 +239,82 @@ export default class Parser {
 
   private parsePrimaryExpression(): Expression {
     switch (this.current.type) {
-      case TokenType.OpenParenthesis: {
-        const openPren = this.matchToken(TokenType.OpenParenthesis);
-        const expression = this.parseExpression();
-        const closePren = this.matchToken(TokenType.CloseParenthesis);
-        return new ParenthesizedExpression(openPren, expression, closePren);
-      }
+      case TokenType.OpenParenthesis:
+        return this.parseParenthesizedExpression();
       case TokenType.True:
-      case TokenType.False: {
-        const token = this.matchToken(TokenType.True, TokenType.False);
-        return new BooleanLiteralExpression(
-          token.type == TokenType.True,
-          token,
-        );
-      }
-      case TokenType.Number: {
-        const numberToken = this.matchToken(TokenType.Number);
-        const numberValue = Number(numberToken.text);
-        return new NumberLiteralExpression(numberValue, numberToken);
-      }
-      case TokenType.String: {
-        const stringToken = this.matchToken(TokenType.String);
-        const stringValue = stringToken.text!.substring(
-          1,
-          stringToken.text!.length - 1,
-        );
-        return new StringLiteralExpression(stringValue, stringToken);
-      }
-      case TokenType.Identifier: {
+      case TokenType.False:
+        return this.parseBooleanLiterial();
+      case TokenType.Number:
+        return this.parseNumberLiterial();
+      case TokenType.String:
+        return this.parseStringLiterial();
+      case TokenType.Identifier:
+        return this.parseCallOrNameExpression();
+      default: {
         if (
-          this.current.type == TokenType.Identifier &&
+          TokenFacts.getTypesKeywords().includes(this.current.type) &&
           this.peek(1).type == TokenType.OpenParenthesis
         ) {
-          return this.parseCallExpression();
+          return this.parseConversionExpression();
         }
-        const token = this.matchToken(TokenType.Identifier);
-        return new NameExpression(token);
-      }
-      default: {
-        const token = this.nextToken();
-        this.diagnostics.reportUnexpectedToken(token.textSpan, token.type);
-        return new ErrorExpression(token);
+        return this.parseErrorExpression();
       }
     }
+  }
+
+  parseConversionExpression(): Expression {
+    const typeToken = this.matchToken(...TokenFacts.getTypesKeywords());
+    const openPren = this.matchToken(TokenType.OpenParenthesis);
+    const expression = this.parseExpression();
+    const closePren = this.matchToken(TokenType.CloseParenthesis);
+    return new ConversionExpression(typeToken, openPren, expression, closePren);
+  }
+
+  parseErrorExpression(): Expression {
+    const token = this.nextToken();
+    this.diagnostics.reportUnexpectedToken(token.textSpan, token.type);
+    return new ErrorExpression(token);
+  }
+
+  parseCallOrNameExpression(): Expression {
+    if (
+      this.current.type == TokenType.Identifier &&
+      this.peek(1).type == TokenType.OpenParenthesis
+    ) {
+      return this.parseCallExpression();
+    }
+    return this.parseNameExpression();
+  }
+
+  parseNameExpression(): Expression {
+    const token = this.matchToken(TokenType.Identifier);
+    return new NameExpression(token);
+  }
+
+  parseStringLiterial(): Expression {
+    const stringToken = this.matchToken(TokenType.String);
+    const stringValue = stringToken.text!.substring(
+      1,
+      stringToken.text!.length - 1,
+    );
+    return new StringLiteralExpression(stringValue, stringToken);
+  }
+  parseNumberLiterial(): Expression {
+    const numberToken = this.matchToken(TokenType.Number);
+    const numberValue = Number(numberToken.text);
+    return new NumberLiteralExpression(numberValue, numberToken);
+  }
+
+  private parseParenthesizedExpression(): Expression {
+    const openPren = this.matchToken(TokenType.OpenParenthesis);
+    const expression = this.parseExpression();
+    const closePren = this.matchToken(TokenType.CloseParenthesis);
+    return new ParenthesizedExpression(openPren, expression, closePren);
+  }
+
+  private parseBooleanLiterial(): Expression {
+    const token = this.matchToken(TokenType.True, TokenType.False);
+    return new BooleanLiteralExpression(token.type == TokenType.True, token);
   }
 
   private parseCallExpression(): CallExpression {

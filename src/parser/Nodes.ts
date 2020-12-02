@@ -166,6 +166,34 @@ export class NameExpression extends Expression {
   }
 }
 
+export class ConversionExpression extends Expression {
+  readonly name = 'ConversionExpression';
+  constructor(
+    readonly typeToken: Token,
+    readonly openParenthesis: Token,
+    readonly expression: Expression,
+    readonly closeParenthesis: Token,
+  ) {
+    super();
+  }
+
+  public get textSpan(): TextSpan {
+    return TextSpan.fromStartEnd(
+      this.typeToken.textSpan.start,
+      this.closeParenthesis.textSpan.end,
+    );
+  }
+
+  public get children(): AstNode[] | undefined {
+    return [
+      this.typeToken,
+      this.openParenthesis,
+      this.expression,
+      this.closeParenthesis,
+    ];
+  }
+}
+
 export class CallExpression extends Expression {
   readonly name = 'CallExpression';
   constructor(

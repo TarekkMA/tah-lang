@@ -77,6 +77,12 @@ export class BoundErrorExpression extends BoundExpression {
   readonly type = TypeSymbol.Error;
 }
 
+export class BoundConversionExpression extends BoundExpression {
+  constructor(readonly type: TypeSymbol, readonly expression: BoundExpression) {
+    super();
+  }
+}
+
 export class BoundCallExpression extends BoundExpression {
   public get type(): TypeSymbol {
     return this.func.returnType;

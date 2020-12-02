@@ -7,6 +7,7 @@ import {
   BlockStatement,
   BooleanLiteralExpression,
   CallExpression,
+  ConversionExpression,
   ErrorExpression,
   Expression,
   ExpressionStatement,
@@ -29,6 +30,7 @@ import {
   BoundBlockStatement,
   BoundBooleanLiteral,
   BoundCallExpression,
+  BoundConversionExpression,
   BoundErrorExpression,
   BoundExpression,
   BoundExpressionStatement,
@@ -45,6 +47,8 @@ import {
 import { BoundBinaryOperator, BoundUnaryOperator } from './BoundOprators';
 import { BoundGlobalScope, BoundScope } from './Scopes';
 import { BuiltinFunctions, FunctionSymbol } from '../symbols/FunctionSymbol';
+import { TokenFacts } from '../lexer/TokenFacts';
+import { Conversion } from './Conversion';
 
 export class Binder {
   public diagnostics = new Diagnostics();
@@ -225,12 +229,31 @@ export class Binder {
       return this.bindBinaryExpression(expression);
     } else if (expression instanceof CallExpression) {
       return this.bindCallExpression(expression);
+    } else if (expression instanceof ConversionExpression) {
+      return this.bindConversionExpression(expression);
     } else if (expression instanceof ErrorExpression) {
       return new BoundErrorExpression();
     }
     throw new Error(
       `Unexpected expression type ${expression.constructor.name}`,
     );
+  }
+
+  private bindConversionExpression(
+    convExp: ConversionExpression,
+  ): BoundExpression {
+    const boundExp = this.bindExpression(convExp.expression);
+    const toType = typeSymbolFromTokenType(convExp.typeToken.type);
+    const conversion = Conversion.classify(boundExp.type, toType);
+    if (!conversion.exists) {
+      this.diagnostics.reportCannotConvert(
+        convExp.textSpan,
+        boundExp.type,
+        toType,
+      );
+      return new BoundErrorExpression();
+    }
+    return new BoundConversionExpression(toType, boundExp);
   }
 
   private bindCallExpression(callExpression: CallExpression): BoundExpression {

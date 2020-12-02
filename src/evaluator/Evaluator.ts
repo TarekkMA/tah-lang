@@ -3,6 +3,7 @@ import {
   BoundBinaryExpression,
   BoundBlockStatement,
   BoundCallExpression,
+  BoundConversionExpression,
   BoundExpression,
   BoundExpressionStatement,
   BoundIfStatement,
@@ -19,6 +20,7 @@ import {
 } from '../binder/BoundOprators';
 import { CallExpression } from '../parser/Nodes';
 import { BuiltinFunctions } from '../symbols/FunctionSymbol';
+import { TypeSymbol } from '../symbols/TypeSymbol';
 import { VariableSymbol } from '../symbols/VariableSymbol';
 import { EvaluatorConsole } from './EvaluatorConsole';
 
@@ -97,10 +99,20 @@ export class Evaluator {
       return this.evaluateBoundBinaryExpression(expression);
     } else if (expression instanceof BoundCallExpression) {
       return this.evaluateCallExpression(expression);
+    } else if (expression instanceof BoundConversionExpression) {
+      return this.evaluateConversionExpression(expression);
     } else {
       throw new Error(`Unexpexted expression ${expression.constructor.name}`);
     }
   }
+  evaluateConversionExpression(convExpr: BoundConversionExpression): any {
+    const value = this.evaluateExpression(convExpr.expression);
+    if (convExpr.type == TypeSymbol.Boolean) return Boolean(value);
+    if (convExpr.type == TypeSymbol.String) return String(value);
+    if (convExpr.type == TypeSymbol.Number) return Number(value);
+    throw new Error(`Unexpected type '${convExpr.type.name}'`);
+  }
+
   evaluateCallExpression(expression: BoundCallExpression): any {
     if (expression.func == BuiltinFunctions.print) {
       const message = this.evaluateExpression(expression.parameters[0]);

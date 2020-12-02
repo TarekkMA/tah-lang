@@ -12,7 +12,7 @@ export const whileExample = `/**
   while x < 50
     x = x + 8
   
-  x /*Result should be 57.7*/
+  print(string(x)) /*Result should be 57.7*/
   "hello" + " " + "Tarek"
 }
 `;
