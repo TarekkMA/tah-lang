@@ -29,7 +29,11 @@ export class BuiltinFunctions {
     [new ParameterSymbol('message', TypeSymbol.String)],
     TypeSymbol.Void,
   );
-  static input = new FunctionSymbol('input', [], TypeSymbol.String);
+  static input = new FunctionSymbol(
+    'input',
+    [new ParameterSymbol('message', TypeSymbol.String)],
+    TypeSymbol.String,
+  );
   static rnd = new FunctionSymbol(
     'rnd',
     [new ParameterSymbol('max', TypeSymbol.Number)],

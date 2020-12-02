@@ -33,60 +33,64 @@ export class Evaluator {
     readonly evalConsole: EvaluatorConsole,
   ) {}
 
-  evaluate(): any {
-    this.evaluateStatement(this.root);
+  async evaluate(): Promise<any> {
+    await this.evaluateStatement(this.root);
     return this.lastValue;
   }
 
-  evaluateStatement(statement: BoundStatement) {
+  async evaluateStatement(statement: BoundStatement): Promise<any> {
     if (statement instanceof BoundBlockStatement) {
-      this.evaluateBoundBlockStatement(statement);
+      await this.evaluateBoundBlockStatement(statement);
     } else if (statement instanceof BoundVariableDeclarationStatement) {
-      this.evaluateBoundVariableDeclarationStatement(statement);
+      await this.evaluateBoundVariableDeclarationStatement(statement);
     } else if (statement instanceof BoundExpressionStatement) {
-      this.evaluateExpressionStatement(statement);
+      await this.evaluateExpressionStatement(statement);
     } else if (statement instanceof BoundIfStatement) {
-      this.evaluateBoundIfStatement(statement);
+      await this.evaluateBoundIfStatement(statement);
     } else if (statement instanceof BoundWhileStatement) {
-      this.evaluateBoundWhileStatement(statement);
+      await this.evaluateBoundWhileStatement(statement);
     } else {
       throw new Error(`Unexpexted statemnt ${statement.constructor.name}`);
     }
   }
-  evaluateBoundWhileStatement(statement: BoundWhileStatement) {
-    while (this.evaluateExpression(statement.condition)) {
-      this.evaluateStatement(statement.body);
+  async evaluateBoundWhileStatement(
+    statement: BoundWhileStatement,
+  ): Promise<any> {
+    while (await this.evaluateExpression(statement.condition)) {
+      await this.evaluateStatement(statement.body);
     }
   }
-  evaluateBoundIfStatement(statement: BoundIfStatement) {
+  async evaluateBoundIfStatement(statement: BoundIfStatement): Promise<any> {
     if (this.evaluateExpression(statement.condition)) {
-      this.evaluateStatement(statement.thenStatement);
+      await this.evaluateStatement(statement.thenStatement);
     } else if (statement.elseStatement != undefined) {
-      this.evaluateStatement(statement.elseStatement);
+      await this.evaluateStatement(statement.elseStatement);
     }
   }
 
-  evaluateBoundBlockStatement(blockStatement: BoundBlockStatement) {
+  async evaluateBoundBlockStatement(
+    blockStatement: BoundBlockStatement,
+  ): Promise<any> {
     for (const statement of blockStatement.statements) {
-      this.evaluateStatement(statement);
+      await this.evaluateStatement(statement);
     }
   }
 
-  evaluateBoundVariableDeclarationStatement(
+  async evaluateBoundVariableDeclarationStatement(
     statement: BoundVariableDeclarationStatement,
-  ) {
+  ): Promise<any> {
     const value = statement.initializer
-      ? this.evaluateExpression(statement.initializer)
+      ? await this.evaluateExpression(statement.initializer)
       : undefined;
     this.variables.set(statement.variable, value);
     this.lastValue = value;
   }
 
-  evaluateExpressionStatement(statement: BoundExpressionStatement) {
-    this.lastValue = this.evaluateExpression(statement.expression);
+  async evaluateExpressionStatement(statement: BoundExpressionStatement) {
+    this.lastValue = await this.evaluateExpression(statement.expression);
   }
 
-  evaluateExpression(expression: BoundExpression): any {
+  async evaluateExpression(expression: BoundExpression): Promise<any> {
     if (expression instanceof BoundLiteralExpression) {
       return this.evaluateBoundLiteralExpression(expression);
     } else if (expression instanceof BoundVariableExpression) {
@@ -105,41 +109,60 @@ export class Evaluator {
       throw new Error(`Unexpexted expression ${expression.constructor.name}`);
     }
   }
-  evaluateConversionExpression(convExpr: BoundConversionExpression): any {
-    const value = this.evaluateExpression(convExpr.expression);
+  async evaluateConversionExpression(
+    convExpr: BoundConversionExpression,
+  ): Promise<any> {
+    const value = await this.evaluateExpression(convExpr.expression);
     if (convExpr.type == TypeSymbol.Boolean) return Boolean(value);
     if (convExpr.type == TypeSymbol.String) return String(value);
     if (convExpr.type == TypeSymbol.Number) return Number(value);
     throw new Error(`Unexpected type '${convExpr.type.name}'`);
   }
 
-  evaluateCallExpression(expression: BoundCallExpression): any {
+  async evaluateCallExpression(expression: BoundCallExpression): Promise<any> {
     if (expression.func == BuiltinFunctions.print) {
-      const message = this.evaluateExpression(expression.parameters[0]);
+      const message = await this.evaluateExpression(expression.parameters[0]);
       this.evalConsole.print(message);
-    } else if (expression.func == BuiltinFunctions.println) {
-      const message = this.evaluateExpression(expression.parameters[0]);
+      return;
+    }
+    if (expression.func == BuiltinFunctions.println) {
+      const message = await this.evaluateExpression(expression.parameters[0]);
       this.evalConsole.print(message + '\n');
-    } else if (expression.func == BuiltinFunctions.rnd) {
-      const max = this.evaluateExpression(expression.parameters[0]) as number;
+      return;
+    }
+    if (expression.func == BuiltinFunctions.input) {
+      const message = await this.evaluateExpression(expression.parameters[0]);
+      const value = await this.evalConsole.input(message);
+      return value;
+    }
+    if (expression.func == BuiltinFunctions.rnd) {
+      const max = (await this.evaluateExpression(
+        expression.parameters[0],
+      )) as number;
       return Math.random() * max;
     }
   }
-  evaluateBoundLiteralExpression(literal: BoundLiteralExpression<any>): any {
+  async evaluateBoundLiteralExpression(
+    literal: BoundLiteralExpression<any>,
+  ): Promise<any> {
     return literal.value;
   }
-  evaluateBoundVariableExpression(expression: BoundVariableExpression): any {
+  async evaluateBoundVariableExpression(
+    expression: BoundVariableExpression,
+  ): Promise<any> {
     return this.variables.get(expression.variable);
   }
-  evaluateBoundAssignmentExpression(
+  async evaluateBoundAssignmentExpression(
     expression: BoundAssignmentExpression,
-  ): any {
-    const value = this.evaluateExpression(expression.expression);
+  ): Promise<any> {
+    const value = await this.evaluateExpression(expression.expression);
     this.variables.set(expression.variable, value);
     return value;
   }
-  evaluateBoundUnaryExpression(expression: BoundUnaryExpression): any {
-    const operandValue = this.evaluateExpression(expression.operand);
+  async evaluateBoundUnaryExpression(
+    expression: BoundUnaryExpression,
+  ): Promise<any> {
+    const operandValue = await this.evaluateExpression(expression.operand);
     switch (expression.oprator.kind) {
       case BoundUnaryOperatorKind.Identity:
         return operandValue;
@@ -155,9 +178,11 @@ export class Evaluator {
         );
     }
   }
-  evaluateBoundBinaryExpression(expression: BoundBinaryExpression): any {
-    const leftValue = this.evaluateExpression(expression.left);
-    const rightValue = this.evaluateExpression(expression.right);
+  async evaluateBoundBinaryExpression(
+    expression: BoundBinaryExpression,
+  ): Promise<any> {
+    const leftValue = await this.evaluateExpression(expression.left);
+    const rightValue = await this.evaluateExpression(expression.right);
 
     switch (expression.operator.kind) {
       case BoundBinaryOperatorKind.Addition:

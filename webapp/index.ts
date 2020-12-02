@@ -75,16 +75,20 @@ const evalConsole: EvaluatorConsole = {
     console.log(message);
     output.value += message;
   },
+  input: async function (message): Promise<string> {
+    const value = prompt(message);
+    return value || '';
+  },
 };
 
-runButton.onclick = function () {
+runButton.onclick = async function () {
   const codeString = editor.getValue();
   const variables = new Map();
   const syntaxTree = SyntaxTree.parse(codeString);
   showAst(syntaxTree);
   const compilation = new Compilation(syntaxTree);
   output.value = 'Output:\n';
-  const result = compilation.evaluate(evalConsole, variables);
+  const result = await compilation.evaluate(evalConsole, variables);
   if (result.diagnostics.length > 0) {
     output.value += 'Failed to run:\n';
     const reports = result.diagnostics.reports;

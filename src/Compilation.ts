@@ -31,10 +31,10 @@ export class Compilation {
     return new Compilation(syntaxTree, this);
   }
 
-  evaluate(
+  async evaluate(
     evalConsole: EvaluatorConsole,
     variables: Map<VariableSymbol, any>,
-  ): EvaluationResult {
+  ): Promise<EvaluationResult> {
     const diagnostics = this.syntaxTree.diagnostics;
     diagnostics.addDiagnostics(this.globalScope.diagnostics);
     if (diagnostics.length) {
@@ -46,7 +46,7 @@ export class Compilation {
       variables,
       evalConsole,
     );
-    const value = evaluator.evaluate();
+    const value = await evaluator.evaluate();
     return new EvaluationResult(new Diagnostics(), value);
   }
 }
