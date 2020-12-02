@@ -83,9 +83,10 @@ runButton.onclick = function () {
   const syntaxTree = SyntaxTree.parse(codeString);
   showAst(syntaxTree);
   const compilation = new Compilation(syntaxTree);
-  output.value = 'Output:\n\n';
+  output.value = 'Output:\n';
   const result = compilation.evaluate(evalConsole, variables);
   if (result.diagnostics.length > 0) {
+    output.value += 'Failed to run:\n';
     const reports = result.diagnostics.reports;
     output.value += reports.map((r) => r.message).join('\n');
     reports.forEach((d) => {
@@ -94,7 +95,7 @@ runButton.onclick = function () {
       errorMarks.push(mark);
     });
   } else {
-    output.value += result.value;
+    output.value += `last eval> ${result.value}\n`;
   }
 };
 
