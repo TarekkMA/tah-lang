@@ -7,6 +7,7 @@ export class TypeSymbol extends Symbol {
   static readonly String = new TypeSymbol('string');
   static readonly Boolean = new TypeSymbol('boolean');
   static readonly Void = new TypeSymbol('void');
+  static readonly Function = new TypeSymbol('func');
 
   private constructor(name: string) {
     super(name);
