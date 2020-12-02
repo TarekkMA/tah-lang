@@ -73,6 +73,10 @@ export class BoundUnaryExpression extends BoundExpression {
   }
 }
 
+export class BoundErrorExpression extends BoundExpression {
+  readonly type = TypeSymbol.Error;
+}
+
 export class BoundCallExpression extends BoundExpression {
   public get type(): TypeSymbol {
     return this.func.returnType;

@@ -7,6 +7,7 @@ import {
   BlockStatement,
   BooleanLiteralExpression,
   CallExpression,
+  ErrorExpression,
   Expression,
   ExpressionStatement,
   IfStatement,
@@ -28,6 +29,7 @@ import {
   BoundBlockStatement,
   BoundBooleanLiteral,
   BoundCallExpression,
+  BoundErrorExpression,
   BoundExpression,
   BoundExpressionStatement,
   BoundIfStatement,
@@ -217,15 +219,15 @@ export class Binder {
       return this.bindBinaryExpression(expression);
     } else if (expression instanceof CallExpression) {
       return this.bindCallExpression(expression);
+    } else if (expression instanceof ErrorExpression) {
+      return new BoundErrorExpression();
     }
     throw new Error(
       `Unexpected expression type ${expression.constructor.name}`,
     );
   }
 
-  private bindCallExpression(
-    callExpression: CallExpression,
-  ): BoundCallExpression {
+  private bindCallExpression(callExpression: CallExpression): BoundExpression {
     const builtinFuns = BuiltinFunctions.getAll();
 
     const search = builtinFuns.filter(
@@ -236,6 +238,7 @@ export class Binder {
 
     if (!isBuiltin) {
       this.diagnostics.reportUndefinedFunction(callExpression.identifier);
+      return new BoundErrorExpression();
     }
 
     const f = search[0];
@@ -247,6 +250,7 @@ export class Binder {
         f.parameters.length,
         callExpression.parameters.length,
       );
+      return new BoundErrorExpression();
     }
     const boundParams: BoundExpression[] = [];
 
@@ -263,6 +267,7 @@ export class Binder {
           param.type,
           boundExpr.type,
         );
+        return new BoundErrorExpression();
       }
     }
 
@@ -296,7 +301,7 @@ export class Binder {
     let variable: VariableSymbol | null = null;
     if ((variable = this.scope?.tryLookup(name) ?? null) == null) {
       this.diagnostics.reportUndefinedName(expression.identifier);
-      return new BoundNumberLiteralExpression(0);
+      return new BoundErrorExpression();
     }
 
     return new BoundVariableExpression(variable);
@@ -340,13 +345,17 @@ export class Binder {
       boundOperand.type,
     );
 
+    if (boundOperand.type == TypeSymbol.Error) {
+      return new BoundErrorExpression();
+    }
+
     if (boundOperator == null) {
       this.diagnostics.reportUndefinedUnaryOperator(
         expression.operator.textSpan,
         expression.operator.text!,
         boundOperand.type,
       );
-      return boundOperand;
+      return new BoundErrorExpression();
     }
 
     return new BoundUnaryExpression(boundOperator, boundOperand);
@@ -362,6 +371,13 @@ export class Binder {
       boundRight.type,
     );
 
+    if (
+      boundLeft.type == TypeSymbol.Error ||
+      boundRight.type == TypeSymbol.Error
+    ) {
+      return new BoundErrorExpression();
+    }
+
     if (boundOperator == null) {
       this.diagnostics.reportUndefinedBinaryOperator(
         expression.oprator.textSpan,
@@ -369,7 +385,7 @@ export class Binder {
         boundLeft.type,
         boundRight.type,
       );
-      return boundLeft;
+      return new BoundErrorExpression();
     }
 
     return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);

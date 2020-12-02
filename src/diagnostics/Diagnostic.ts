@@ -40,14 +40,13 @@ export class Diagnostics {
     foundToken: TokenType,
     ...expectedTypes: TokenType[]
   ): void {
-    this.report(
-      span,
-      `Unexpected token <${TokenFacts.getTypeName(
-        foundToken,
-      )}>, expected ${expectedTypes
+    let message = `Unexpected token <${TokenFacts.getTypeName(foundToken)}>`;
+    if (expectedTypes.length > 0) {
+      message += `, expected ${expectedTypes
         .map((t) => '<' + TokenFacts.getTypeName(t) + '>')
-        .join(' or ')}.`,
-    );
+        .join(' or ')}`;
+    }
+    this.report(span, message + '.');
   }
 
   reportMustHaveAnInitializerOrType(

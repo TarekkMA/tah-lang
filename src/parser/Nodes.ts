@@ -10,12 +10,16 @@ export abstract class SyntaxNode implements AstNode {
 }
 
 export abstract class Expression extends SyntaxNode {}
-export class ExpressionStub extends Expression {
-  readonly textSpan = TextSpan.fromStartLength(0, 0);
-  readonly name = 'ExpressionStub';
+export class ErrorExpression extends Expression {
+  readonly textSpan = this.token.textSpan;
+  readonly name = 'ErrorExpression';
+
+  constructor(readonly token: Token) {
+    super();
+  }
 
   public get children(): AstNode[] | undefined {
-    return undefined;
+    return [this.token];
   }
 }
 

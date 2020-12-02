@@ -13,7 +13,7 @@ import {
   ElseClause,
   Expression,
   ExpressionStatement,
-  ExpressionStub,
+  ErrorExpression,
   IfStatement,
   NameExpression,
   NumberLiteralExpression,
@@ -265,8 +265,7 @@ export default class Parser {
         );
         return new StringLiteralExpression(stringValue, stringToken);
       }
-      case TokenType.Identifier:
-      default: {
+      case TokenType.Identifier: {
         if (
           this.current.type == TokenType.Identifier &&
           this.peek(1).type == TokenType.OpenParenthesis
@@ -275,6 +274,11 @@ export default class Parser {
         }
         const token = this.matchToken(TokenType.Identifier);
         return new NameExpression(token);
+      }
+      default: {
+        const token = this.nextToken();
+        this.diagnostics.reportUnexpectedToken(token.textSpan, token.type);
+        return new ErrorExpression(token);
       }
     }
   }

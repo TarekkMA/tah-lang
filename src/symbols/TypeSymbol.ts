@@ -2,6 +2,7 @@ import { TokenType } from '../lexer/token';
 import { Symbol } from './Symbol';
 
 export class TypeSymbol extends Symbol {
+  static readonly Error = new TypeSymbol('?');
   static readonly Number = new TypeSymbol('number');
   static readonly String = new TypeSymbol('string');
   static readonly Boolean = new TypeSymbol('boolean');
