@@ -15,6 +15,7 @@ export enum BoundBinaryOperatorKind {
   GreaterThan,
   GreaterThanOrEqualsTo,
   Concatination,
+  Remainder,
 }
 
 export class BoundBinaryOperator {
@@ -80,6 +81,13 @@ export class BoundBinaryOperator {
     new BoundBinaryOperator(
       TokenType.Slash,
       BoundBinaryOperatorKind.Division,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+      TypeSymbol.Number,
+    ),
+    new BoundBinaryOperator(
+      TokenType.PercentageMark,
+      BoundBinaryOperatorKind.Remainder,
       TypeSymbol.Number,
       TypeSymbol.Number,
       TypeSymbol.Number,

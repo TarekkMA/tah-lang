@@ -194,6 +194,8 @@ export class Evaluator {
         return leftValue * rightValue;
       case BoundBinaryOperatorKind.Division:
         return leftValue / rightValue;
+      case BoundBinaryOperatorKind.Remainder:
+        return leftValue % rightValue;
       case BoundBinaryOperatorKind.LogicalAnd:
         return leftValue && rightValue;
       case BoundBinaryOperatorKind.LogicalOr:

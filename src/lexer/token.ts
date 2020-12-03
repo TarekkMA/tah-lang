@@ -1,6 +1,7 @@
 import { TextSpan } from '../TextSpan';
 import { AstNode } from '../visualization/ast';
 
+
 export enum TokenType {
   WhiteSpace,
   Comment,
@@ -50,6 +51,7 @@ export enum TokenType {
   WhileKeyword,
   ElseKeyword,
   Comma,
+  PercentageMark
 }
 
 export class Token implements AstNode {

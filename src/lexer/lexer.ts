@@ -45,6 +45,7 @@ export const lexerPatterns: LexerPattern[] = [
   new LexerPattern(/^\-/, TokenType.Minus),
   new LexerPattern(/^\//, TokenType.Slash),
   new LexerPattern(/^\*/, TokenType.Star),
+  new LexerPattern(/^\%/, TokenType.PercentageMark),
   new LexerPattern(/^\(/, TokenType.OpenParenthesis),
   new LexerPattern(/^\)/, TokenType.CloseParenthesis),
   new LexerPattern(/^\{/, TokenType.OpenBrace),

@@ -17,6 +17,7 @@ export class TokenFacts {
 
   static getBinaryOperatorPrecedence(type: TokenType): number | null {
     switch (type) {
+      case TokenType.PercentageMark:
       case TokenType.Star:
       case TokenType.Slash:
         return 5;
@@ -57,6 +58,7 @@ export class TokenFacts {
 
   static getBinaryOpertors(): TokenType[] {
     return [
+      TokenType.PercentageMark,
       TokenType.Star,
       TokenType.Slash,
       TokenType.Plus,
