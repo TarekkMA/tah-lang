@@ -10,7 +10,7 @@ import 'jstree';
 import { AstNode } from '../src/visualization/ast';
 import { TextSpan } from '../src/TextSpan';
 
-import { whileExample } from './code-examples';
+import { codeExampleSnippets } from './code-examples';
 import { defineTahMode, tahModeName } from './tah-mode';
 
 import Split from 'split.js';
@@ -34,7 +34,7 @@ Split(['#top-panel', '#bottom-panel'], {
   sizes: [75, 25],
 });
 
-Split(['#vseditor', '#ast_cont'], {
+Split(['#editor_container', '#ast_cont'], {
   direction: 'horizontal',
   sizes: [75, 25],
 });
@@ -48,16 +48,34 @@ const astSpans: Map<string, TextSpan | undefined> = new Map();
 
 defineTahMode();
 
-const editor = CodeMirror(document.getElementById('vseditor')!, {
-  value: whileExample,
+const output = document.getElementById('output')! as HTMLTextAreaElement;
+
+const codeExamplesSelect = document.getElementById(
+  'example_select',
+)! as HTMLSelectElement;
+
+for (const exampleName in codeExampleSnippets) {
+  if (Object.prototype.hasOwnProperty.call(codeExampleSnippets, exampleName)) {
+    const option = document.createElement('option');
+    option.value = exampleName;
+    option.text = exampleName;
+    codeExamplesSelect.options.add(option);
+  }
+}
+
+codeExamplesSelect.onchange = () => {
+  const codeString = codeExampleSnippets[codeExamplesSelect.value];
+  editor.setValue(codeString);
+};
+
+const editor = CodeMirror(document.getElementById('editor')!, {
+  value: codeExampleSnippets[codeExamplesSelect.value],
   lineNumbers: true,
   theme: 'darcula',
   mode: tahModeName,
   tabSize: 2,
   viewportMargin: Infinity,
 });
-
-const output = document.getElementById('output')! as HTMLTextAreaElement;
 
 output.onkeypress = function (e) {
   console.log(e);
