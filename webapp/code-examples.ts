@@ -18,6 +18,17 @@ export const whileExample = `/**
   }
   println("")
   
+  while(i < 24) {
+  	print("The number " + string(i) + " is an ")
+  	if(i % 2 == 0)
+    	print("even")
+    else
+    	print("odd")
+    println(" number")
+    i = i + 1
+  }
+  println("")
+  
   while x < 50
     x = x + 8.1
   
