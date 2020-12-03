@@ -5,11 +5,14 @@ import * as CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/darcula.css';
 import 'jstree/dist/themes/default/style.min.css';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import './code-styles.css';
 import 'jstree';
 import { AstNode } from '../src/visualization/ast';
 import { TextSpan } from '../src/TextSpan';
-
+import * as bootbox from 'bootbox';
 import { codeExampleSnippets } from './code-examples';
 import { defineTahMode, tahModeName } from './tah-mode';
 
@@ -93,9 +96,15 @@ const evalConsole: EvaluatorConsole = {
     console.log(message);
     output.value += message;
   },
-  input: async function (message): Promise<string> {
-    const value = prompt(message);
-    return value || '';
+  input: function (message): Promise<string> {
+    return new Promise<string>((resolve) => {
+      bootbox.prompt({
+        title: message,
+        callback: (result) => {
+          resolve(result || '');
+        },
+      });
+    });
   },
 };
 

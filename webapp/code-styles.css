@@ -28,6 +28,7 @@ body {
   height: 100%;
 }
 
+
 html,
 body {
   height: 100%;
@@ -49,6 +50,7 @@ input:focus {
   background: #000;
   color: greenyellow;
   font-size: 2em;
+  font-family: monospace;
   border: 0px #000;
   overflow: scroll;
   resize: none;
@@ -59,5 +61,16 @@ input:focus {
 }
 
 #output::-webkit-scrollbar {
+  display: none;
+}
+
+#editor{
+  flex: 1 0 auto;
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+#editor::-webkit-scrollbar {
   display: none;
 }
