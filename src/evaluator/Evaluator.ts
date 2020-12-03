@@ -18,7 +18,6 @@ import {
   BoundBinaryOperatorKind,
   BoundUnaryOperatorKind,
 } from '../binder/BoundOprators';
-import { CallExpression } from '../parser/Nodes';
 import { BuiltinFunctions } from '../symbols/FunctionSymbol';
 import { TypeSymbol } from '../symbols/TypeSymbol';
 import { VariableSymbol } from '../symbols/VariableSymbol';
@@ -86,7 +85,9 @@ export class Evaluator {
     this.lastValue = value;
   }
 
-  async evaluateExpressionStatement(statement: BoundExpressionStatement) {
+  async evaluateExpressionStatement(
+    statement: BoundExpressionStatement,
+  ): Promise<any> {
     this.lastValue = await this.evaluateExpression(statement.expression);
   }
 
