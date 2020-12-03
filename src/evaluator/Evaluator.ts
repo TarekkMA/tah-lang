@@ -60,7 +60,7 @@ export class Evaluator {
     }
   }
   async evaluateBoundIfStatement(statement: BoundIfStatement): Promise<any> {
-    if (this.evaluateExpression(statement.condition)) {
+    if ((await this.evaluateExpression(statement.condition)) == true) {
       await this.evaluateStatement(statement.thenStatement);
     } else if (statement.elseStatement != undefined) {
       await this.evaluateStatement(statement.elseStatement);
