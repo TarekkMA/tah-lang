@@ -39,6 +39,28 @@ export const whileExample = `/**
 `;
 
 export const codeExampleSnippets = {
+  'Cosine Calculation': `{
+  //input(...) returns string so a cast is needed
+  val x as number = number(input("Enter x to calculate cos(x)"))
+  
+  /*=== Variables ===*/
+  var cos = 1
+  var n = 1
+  var eps = 0.1
+  var term = 1
+  var alt = -1
+  
+  println("==Cosine Calculation==")
+  
+  while term > eps {
+    term = term * x * x / n / ( n + 1 )
+    cos = cos + alt * term
+    alt = -alt
+    n = n + 2
+  }
+  
+  println("cos("+string(x)+") = " + string(cos))
+}`,
   'multiplication table': `{
   println("==Multiplication Table==")
   var i = 0
